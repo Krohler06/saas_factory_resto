@@ -1,0 +1,80 @@
+name: little_africa_nice
+services:
+  n8n:
+    container_name: little_africa_nice_n8n
+    depends_on:
+      postgres:
+        condition: service_started
+        required: true
+    environment:
+      BASE_DOMAIN: cyber-saas-private.ddnsfree.com
+      CLIENT_ID: little_africa_nice
+      DB_POSTGRESDB_DATABASE: booking_shared_little_africa
+      DB_POSTGRESDB_HOST: little_africa_nice_postgres
+      DB_POSTGRESDB_PASSWORD: Little_AfricaPwd123!
+      DB_POSTGRESDB_PORT: "5432"
+      DB_POSTGRESDB_USER: booking_little_africa
+      DB_TYPE: postgresdb
+      GENERIC_TIMEZONE: Europe/Paris
+      INTERNAL_API_TOKEN: ChangeMeInternalToken12345
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_PASSWORD: ChangeMeAdminPwd123!
+      N8N_BASIC_AUTH_USER: admin
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_DISABLE_UI: "false"
+      N8N_EDITOR_BASE_URL: https://cyber-saas-private.ddnsfree.com/little_africa_nice/
+      N8N_ENCRYPTION_KEY: ChangeMeEncryptionKey1234567890abcdef
+      N8N_HOST: cyber-saas-private.ddnsfree.com
+      N8N_LOG_LEVEL: debug
+      N8N_PATH: /little_africa_nice/
+      N8N_PORT: "5678"
+      N8N_PROTOCOL: https
+      N8N_TEMPLATES_ENABLED: "false"
+      N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
+      OPENAI_API_KEY: CHANGE_ME_OPENAI_API_KEY
+      POSTGRES_DB: booking_shared_little_africa
+      POSTGRES_PASSWORD: Little_AfricaPwd123!
+      POSTGRES_USER: booking_little_africa
+      RESTAURANT_NAME: Little Africa
+      RESTAURANT_SLUG: little_africa_nice
+      RESTAURANT_TIMEZONE: Europe/Paris
+      TELEGRAM_BOT_TOKEN: CHANGE_ME_TELEGRAM_BOT_TOKEN
+      TELEGRAM_BOT_USERNAME: CHANGE_ME_BOT_USERNAME
+      TLS_EMAIL: jeremy.lemaire1503@gmail.com
+      WEBHOOK_URL: https://cyber-saas-private.ddnsfree.com/little_africa_nice/
+    image: n8nio/n8n:latest
+    networks:
+      saas_net: null
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /opt/clients/little_africa_nice/data/n8n
+        target: /home/node/.n8n
+        bind: {}
+      - type: bind
+        source: /opt/clients/little_africa_nice/workflows
+        target: /workflows
+        bind: {}
+      - type: bind
+        source: /opt/clients/little_africa_nice/sql
+        target: /sql
+        bind: {}
+  postgres:
+    container_name: little_africa_nice_postgres
+    environment:
+      POSTGRES_DB: booking_shared_little_africa
+      POSTGRES_PASSWORD: Little_AfricaPwd123!
+      POSTGRES_USER: booking_little_africa
+    image: postgres:16
+    networks:
+      saas_net: null
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /opt/clients/little_africa_nice/data/postgres
+        target: /var/lib/postgresql/data
+        bind: {}
+networks:
+  saas_net:
+    name: saas_net
+    external: true

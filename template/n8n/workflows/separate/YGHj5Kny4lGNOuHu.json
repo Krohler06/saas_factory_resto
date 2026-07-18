@@ -1,0 +1,291 @@
+{
+  "updatedAt": "2026-07-18T17:53:00.026Z",
+  "createdAt": "2026-07-18T17:30:05.822Z",
+  "id": "YGHj5Kny4lGNOuHu",
+  "name": "event_broadcast",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "wf_evt_001",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM restaurant_closures WHERE restaurant_id = {{$json.restaurant_id}} AND is_active = true ORDER BY starts_at DESC LIMIT 1;"
+      },
+      "id": "wf_evt_002",
+      "name": "Get Event Context",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "name": "POSTGRES_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT DISTINCT c.* FROM clients c JOIN reservations r ON r.client_id = c.id WHERE r.restaurant_id = {{$json.restaurant_id}} AND r.start_time::date >= CURRENT_DATE AND c.consent_notifications = true;"
+      },
+      "id": "wf_evt_003",
+      "name": "Find Affected Clients",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        720,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "name": "POSTGRES_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.consent_notifications}}",
+              "operation": "isTrue"
+            }
+          ]
+        }
+      },
+      "id": "wf_evt_004",
+      "name": "Consent to notifications?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 20
+      },
+      "id": "wf_evt_005",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { ...$json, event_message: `Bonjour, une information importante concerne votre réservation. Merci de votre compréhension.` } }];"
+      },
+      "id": "wf_evt_006",
+      "name": "Build Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@restaurant.local",
+        "toEmail": "={{$json.email}}",
+        "subject": "Information restaurant",
+        "text": "={{$json.event_message}}"
+      },
+      "id": "wf_evt_007",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "name": "SMTP_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO client_notifications (restaurant_id, client_id, notification_type, channel, content, status, sent_at) VALUES ({{$json.restaurant_id}}, {{$json.id}}, 'event_update', 'email', {{$json.event_message}}, 'sent', now());"
+      },
+      "id": "wf_evt_008",
+      "name": "Log Notification",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "name": "POSTGRES_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO reservation_events (restaurant_id, event_type, event_data) VALUES ({{$json.restaurant_id}}, 'event_broadcast', jsonb_build_object('message', {{$json.event_message}}));"
+      },
+      "id": "wf_evt_009",
+      "name": "Log Event",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "name": "POSTGRES_CREDENTIAL_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Event Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Event Context": {
+      "main": [
+        [
+          {
+            "node": "Find Affected Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Affected Clients": {
+      "main": [
+        [
+          {
+            "node": "Consent to notifications?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consent to notifications?": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Build Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Message": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Notification": {
+      "main": [
+        [
+          {
+            "node": "Log Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Notification": {
+      "main": [
+        [
+          {
+            "node": "Log Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "d734a71e-3e0d-41f8-9f59-a0fde2dd289a",
+  "activeVersionId": null,
+  "versionCounter": 1,
+  "triggerCount": 0,
+  "sourceWorkflowId": null,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T17:30:05.822Z",
+      "createdAt": "2026-07-18T17:30:05.822Z",
+      "role": "workflow:owner",
+      "workflowId": "YGHj5Kny4lGNOuHu",
+      "projectId": "qCyrAhwkn3YBEnnC",
+      "project": {
+        "updatedAt": "2026-07-18T16:53:40.765Z",
+        "createdAt": "2026-06-26T07:15:48.107Z",
+        "id": "qCyrAhwkn3YBEnnC",
+        "name": "Jérémy Lemaire <lemaire.jerem@orange.fr>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "customTelemetryTags": [],
+        "creatorId": "1c348afe-df46-47f4-b6d4-933ef081ab0d"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

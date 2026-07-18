@@ -1,0 +1,1353 @@
+{
+  "updatedAt": "2026-06-26T20:30:54.554Z",
+  "createdAt": "2026-06-12T04:37:34.998Z",
+  "id": "UgthKUfZdXW385HG",
+  "name": "reservation_inbound",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reservation-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "bc1546b2-8b7f-4bc7-a9bb-8209913d2850",
+      "name": "Webhook Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        192,
+        592
+      ],
+      "webhookId": "c7b91e85-e218-44e9-9e5a-a4159fbca630"
+    },
+    {
+      "parameters": {
+        "jsCode": "const root = $json.body ?? $json;\nconst mail = root.mail ?? root.email ?? null;\nconst call = root.call ?? root;\nconst telegram = root.message?.from ? root.message : null;\n\nfunction clean(v) {\n  return v === undefined || v === null || v === '' || v === 'null' ? null : v;\n}\n\nfunction asString(v) {\n  return v === undefined || v === null ? null : String(v);\n}\n\nconst source =\n  clean(root.source) ??\n  (telegram ? 'telegram' : null) ??\n  (mail ? 'email' : null) ??\n  (root.sms ? 'sms' : null) ??\n  (call?.call_id ? 'call' : null) ??\n  'webhook';\n\nconst channel =\n  clean(root.channel) ??\n  (source === 'telegram' ? 'telegram' :\n   source === 'email' ? 'mail' :\n   source === 'sms' ? 'sms' :\n   source === 'call' ? 'phone' :\n   'webhook');\n\nconst isTelegram = source === 'telegram' || !!telegram;\nconst tg = telegram ?? {};\nconst tgFrom = tg.from ?? {};\nconst tgChat = tg.chat ?? {};\n\nconst emailValue =\n  clean(root.email) ??\n  clean(mail?.from) ??\n  clean(mail?.sender) ??\n  clean(mail?.reply_to) ??\n  null;\n\nconst phoneValue =\n  clean(root.phone) ??\n  clean(root.from) ??\n  clean(root.sms?.from) ??\n  clean(root.phone_number) ??\n  clean(call?.from) ??\n  clean(call?.caller) ??\n  (isTelegram ? null : null);\n\nconst fullNameValue =\n  clean(root.full_name) ??\n  clean(mail?.from_name) ??\n  clean(mail?.name) ??\n  (isTelegram ? [tgFrom.first_name, tgFrom.last_name].filter(Boolean).join(' ') || null : null);\n\nconst restaurantSlug =\n  clean(root.restaurant_slug) ??\n  clean(root.slug) ??\n  null;\n\nconst toValue =\n  clean(root.to) ??\n  clean(mail?.to) ??\n  clean(root.sms?.to) ??\n  (isTelegram ? asString(tgChat.id) : null) ??\n  null;\n\nconst fromValue =\n  clean(root.from) ??\n  clean(mail?.from) ??\n  clean(root.sms?.from) ??\n  (isTelegram ? asString(tgFrom.id) : null) ??\n  null;\n\nconst messageValue =\n  clean(root.text) ??\n  clean(mail?.text) ??\n  clean(mail?.subject) ??\n  clean(root.sms?.text) ??\n  (isTelegram ? clean(tg.text) : null) ??\n  '';\n\nconst rawMessageValue = messageValue;\n\nconst conversation_id =\n  clean(root.conversation_id) ??\n  (isTelegram ? `telegram-${tgChat.id ?? tgFrom.id ?? Date.now()}` : null) ??\n  (source === 'email' ? `email-${clean(mail?.message_id) ?? Date.now()}` : null) ??\n  (source === 'sms' ? `sms-${phoneValue ?? Date.now()}` : null) ??\n  (source === 'call' ? `call-${clean(call?.call_id) ?? Date.now()}` : null) ??\n  (phoneValue ? `phone-${phoneValue}` : null) ??\n  `anon-${Date.now()}`;\n\nreturn [{\n  json: {\n    source,\n    channel,\n    telegram_chat_id: isTelegram ? asString(tgChat.id) : null,\n    user_message: messageValue,\n    restaurant_slug: restaurantSlug,\n    to: toValue,\n    from: fromValue,\n    phone: clean(root.phone) ?? phoneValue,\n    email: emailValue,\n    full_name: fullNameValue,\n    message: messageValue,\n    raw_message: rawMessageValue,\n    intent: clean(root.intent),\n    requested_datetime: clean(root.requested_datetime),\n    party_size: clean(root.party_size),\n    special_request: clean(root.special_request),\n    call_id: clean(root.call_id) ?? clean(call?.call_id),\n    call_status: clean(root.call_status) ?? clean(call?.status),\n    conversation_id\n  }\n}];\n"
+      },
+      "id": "4dbe6432-8ae5-4fe7-8ce5-420a84b044e6",
+      "name": "Normalize Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.restaurant_slug}}",
+              "operation": "notEmpty"
+            }
+          ],
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          }
+        },
+        "options": {}
+      },
+      "id": "6f3bd19e-d318-4593-93a7-cdd92030b893",
+      "name": "Has restaurant_slug?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        656,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  r.id AS restaurant_id,\n  r.slug,\n  r.name,\n  r.timezone,\n  s.default_meal_duration_minutes,\n  s.cleaning_buffer_minutes,\n  s.grace_delay_minutes,\n  s.max_party_size,\n  s.allow_combined_tables,\n  s.reminder_days_before,\n  s.reminder_hour,\n  s.reminder_channel,\n  s.booking_policy,\n  s.event_notification_policy\nFROM restaurants r\nJOIN restaurant_settings s ON s.restaurant_id = r.id\nWHERE r.slug = '{{$json.restaurant_slug}}'\n  AND r.is_active = true\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "8eca8339-cc5e-40b2-9b50-d1dc0e7d19c9",
+      "name": "Lookup Restaurant by Slug",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        896,
+        464
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  r.id AS restaurant_id,\n  r.slug,\n  r.name,\n  r.timezone,\n  s.default_meal_duration_minutes,\n  s.cleaning_buffer_minutes,\n  s.grace_delay_minutes,\n  s.max_party_size,\n  s.allow_combined_tables,\n  s.reminder_days_before,\n  s.reminder_hour,\n  s.reminder_channel,\n  s.booking_policy,\n  s.event_notification_policy\nFROM restaurant_channels c\nJOIN restaurants r ON r.id = c.restaurant_id\nJOIN restaurant_settings s ON s.restaurant_id = r.id\nWHERE c.is_active = true\n  AND r.is_active = true\n  AND c.channel_type = '{{$json.source}}'\n  AND c.channel_value = '{{$json.to}}'\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "4922e8f7-1bb7-4cd8-989f-31b6f3e5d78f",
+      "name": "Lookup Restaurant by Channel",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        896,
+        784
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nconst original = $('Normalize Input').item.json;\n\nconst FALLBACK_RESTAURANT_ID = 1;\nconst FALLBACK_RESTAURANT_SLUG = 'thysiane-house';\nconst FALLBACK_RESTAURANT_NAME = 'Thysiane House';\n\nreturn [{\n  json: {\n    restaurant_id: input.restaurant_id ?? FALLBACK_RESTAURANT_ID,\n    restaurant_slug: input.slug ?? FALLBACK_RESTAURANT_SLUG,\n    restaurant_name: input.name ?? FALLBACK_RESTAURANT_NAME,\n    timezone: input.timezone ?? 'Europe/Paris',\n\n    restaurant_lookup_ok: !!input.restaurant_id,\n    restaurant_used_fallback: !input.restaurant_id,\n\n    default_meal_duration_minutes: input.default_meal_duration_minutes ?? 120,\n    cleaning_buffer_minutes: input.cleaning_buffer_minutes ?? 15,\n    grace_delay_minutes: input.grace_delay_minutes ?? 10,\n    max_party_size: input.max_party_size ?? 12,\n    allow_combined_tables: input.allow_combined_tables ?? false,\n    reminder_days_before: input.reminder_days_before ?? 1,\n    reminder_hour: input.reminder_hour ?? 9,\n    reminder_channel: input.reminder_channel ?? 'telegram',\n    booking_policy: input.booking_policy ?? null,\n    event_notification_policy: input.event_notification_policy ?? null,\n\n    source: original.source ?? input.source ?? null,\n    channel: original.channel ?? input.channel ?? null,\n    to: original.to ?? input.to ?? null,\n    from: original.from ?? input.from ?? null,\n    telegram_chat_id: original.telegram_chat_id ?? original.to ?? null,\n\n    phone: original.phone ?? input.phone ?? null,\n    email: original.email ?? input.email ?? null,\n    full_name: original.full_name ?? input.full_name ?? null,\n    message: original.message ?? input.message ?? '',\n    raw_message: original.raw_message ?? input.raw_message ?? '',\n    intent: original.intent ?? input.intent ?? null,\n    requested_datetime: original.requested_datetime ?? input.requested_datetime ?? null,\n    party_size: original.party_size ?? input.party_size ?? null,\n    special_request: original.special_request ?? input.special_request ?? null,\n    call_id: original.call_id ?? input.call_id ?? null,\n    call_status: original.call_status ?? input.call_status ?? null,\n    conversation_id: original.conversation_id ?? input.conversation_id ?? null\n  }\n}];"
+      },
+      "id": "b9caa35c-f1fd-4b4e-a0dd-fab7f320e8e4",
+      "name": "Normalize Restaurant Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.restaurant_id}}",
+              "operation": "notEmpty"
+            }
+          ],
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          }
+        },
+        "options": {}
+      },
+      "id": "80a43a54-3822-4d68-bdfe-0310075da9f9",
+      "name": "Restaurant Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS conversation_sessions (\n  id BIGSERIAL PRIMARY KEY,\n  restaurant_id BIGINT NOT NULL,\n  conversation_id TEXT NOT NULL,\n  state JSONB NOT NULL DEFAULT '{}'::jsonb,\n  last_message TEXT,\n  last_agent_reply TEXT,\n  status TEXT NOT NULL DEFAULT 'active',\n  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  UNIQUE (restaurant_id, conversation_id)\n);",
+        "options": {}
+      },
+      "id": "41896736-ef7b-4f29-b106-e3ba5bbd2cff",
+      "name": "Ensure Conversation Sessions Table",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        352
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM conversation_sessions\nWHERE restaurant_id = {{ $('Normalize Restaurant Context').item.json.restaurant_id }}\n  AND conversation_id = '{{ $('Normalize Input').item.json.conversation_id }}'\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "531121e9-1fc3-4ae7-a144-dc6a28560d75",
+      "name": "Load Conversation Session",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        2176,
+        224
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const restaurant = $('Normalize Restaurant Context').item.json;\nconst input = $('Normalize Input').item.json;\nconst loadedSession = $('Load Conversation Session').item.json;\n\nreturn [{\n  json: {\n    ...restaurant,\n\n    telegram_chat_id: input.telegram_chat_id ?? null,\n    user_message: input.user_message ?? '',\n    raw_message: input.raw_message ?? '',\n    message: input.message ?? input.user_message ?? '',\n    conversation_id: input.conversation_id ?? null,\n\n    source: input.source ?? restaurant.source ?? null,\n    channel: input.channel ?? restaurant.channel ?? null,\n    to: input.to ?? restaurant.to ?? null,\n    from: input.from ?? restaurant.from ?? null,\n    phone: input.phone ?? restaurant.phone ?? null,\n    email: input.email ?? restaurant.email ?? null,\n    full_name: input.full_name ?? restaurant.full_name ?? null,\n\n    intent: input.intent ?? null,\n    requested_datetime: input.requested_datetime ?? null,\n    party_size: input.party_size ?? null,\n    special_request: input.special_request ?? null,\n    call_id: input.call_id ?? null,\n    call_status: input.call_status ?? null,\n\n    session_state: loadedSession.state ?? {},\n    session_id: loadedSession.id ?? null,\n    session_status: loadedSession.status ?? 'new'\n  }\n}];\n"
+      },
+      "id": "663e0932-1045-4f53-94ba-4f6f0f10a221",
+      "name": "Merge Session Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2352,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2512,
+        528
+      ],
+      "id": "af3222ed-fcb0-4a5c-b7fb-9de014d548e6",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bwymyf0M179cgw6O",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ String($json.restaurant_id || 'restaurant') + ':' + String($json.conversation_id || $json.from || $json.phone || 'default-session') }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        2720,
+        512
+      ],
+      "id": "e7c273d7-0cb9-424f-b702-f8c82188791b",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\"output\"],\n  \"properties\": {\n    \"output\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"required\": [\n        \"decision\",\n        \"reply\",\n        \"needs_followup\",\n        \"missing_fields\",\n        \"special_requests\",\n        \"extracted_data\"\n      ],\n      \"properties\": {\n        \"decision\": {\n          \"type\": \"string\",\n          \"enum\": [\"need_followup\", \"confirm\", \"unavailable\", \"cancel\", \"unknown\", \"technical_error\"]\n        },\n        \"reply\": {\n          \"type\": \"string\"\n        },\n        \"needs_followup\": {\n          \"type\": \"boolean\"\n        },\n        \"missing_fields\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"string\"\n          }\n        },\n        \"special_requests\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"string\"\n          }\n        },\n        \"extracted_data\": {\n          \"type\": \"object\",\n          \"additionalProperties\": false,\n          \"required\": [\n            \"requested_datetime\",\n            \"party_size\",\n            \"full_name\",\n            \"phone\",\n            \"email\",\n            \"special_request\"\n          ],\n          \"properties\": {\n            \"requested_datetime\": {\n              \"type\": [\"string\", \"null\"]\n            },\n            \"party_size\": {\n              \"type\": [\"number\", \"null\"]\n            },\n            \"full_name\": {\n              \"type\": [\"string\", \"null\"]\n            },\n            \"phone\": {\n              \"type\": [\"string\", \"null\"]\n            },\n            \"email\": {\n              \"type\": [\"string\", \"null\"]\n            },\n            \"special_request\": {\n              \"type\": [\"string\", \"null\"]\n            }\n          }\n        }\n      }\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2976,
+        544
+      ],
+      "id": "d82502e7-a45d-45e9-8dfc-707bcb2357f3",
+      "name": "Structured Output Parser1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const sessionContext = $('Merge Session Context').item.json;\n\nfunction extractFirstJsonObject(text) {\n  if (typeof text !== 'string') return text;\n\n  let s = text.trim();\n\n  s = s.replace(/^```json\\s*/i, '');\n  s = s.replace(/^```\\s*/i, '');\n  s = s.replace(/```$/i, '');\n  s = s.trim();\n\n  const start = s.indexOf('{');\n  if (start === -1) return s;\n\n  let depth = 0;\n  let inString = false;\n  let escaped = false;\n\n  for (let i = start; i < s.length; i++) {\n    const ch = s[i];\n\n    if (escaped) {\n      escaped = false;\n      continue;\n    }\n\n    if (ch === '\\\\') {\n      escaped = true;\n      continue;\n    }\n\n    if (ch === '\"') {\n      inString = !inString;\n      continue;\n    }\n\n    if (!inString) {\n      if (ch === '{') depth++;\n      if (ch === '}') depth--;\n\n      if (depth === 0) {\n        return s.slice(start, i + 1);\n      }\n    }\n  }\n\n  return s.slice(start);\n}\n\nfunction keepNewOrPrevious(newValue, oldValue) {\n  if (\n    newValue === undefined ||\n    newValue === null ||\n    newValue === '' ||\n    newValue === 'null'\n  ) {\n    return oldValue ?? null;\n  }\n\n  return newValue;\n}\n\nfunction parsePartySize(text) {\n  if (!text) return null;\n\n  const cleanText = text.toLowerCase();\n\n  const words = {\n    'un': 1,\n    'une': 1,\n    'deux': 2,\n    'trois': 3,\n    'quatre': 4,\n    'cinq': 5,\n    'six': 6,\n    'sept': 7,\n    'huit': 8,\n    'neuf': 9,\n    'dix': 10,\n    'onze': 11,\n    'douze': 12\n  };\n\n  let match;\n\n  // \"7 personnes\", \"7 pers\", \"7 couverts\"\n  match = cleanText.match(/\\b(\\d{1,2})\\s*(?:personnes?|pers|couverts?)\\b/i);\n  if (match) return Number(match[1]);\n\n  // \"table de 7\", \"table pour 7\"\n  match = cleanText.match(/\\btable\\s+(?:de|pour)\\s+(\\d{1,2})\\b/i);\n  if (match) return Number(match[1]);\n\n  // \"réservation de 7\", \"réservation pour 7\"\n  match = cleanText.match(/\\bréservation\\s+(?:de|pour)\\s+(\\d{1,2})\\b/i);\n  if (match) return Number(match[1]);\n\n  // \"nous serons 7\", \"on sera 7\", \"nous sommes 7\", \"on est 7\"\n  match = cleanText.match(/\\b(?:nous serons|on sera|nous sommes|on est)\\s+(\\d{1,2})\\b/i);\n  if (match) return Number(match[1]);\n\n  // \"anniversaire de 6 personnes\"\n  match = cleanText.match(/\\bde\\s+(\\d{1,2})\\s*(?:personnes?|pers|couverts?)\\b/i);\n  if (match) return Number(match[1]);\n\n  // \"pour deux personnes\", \"deux personnes\", \"table de sept\"\n  for (const [word, value] of Object.entries(words)) {\n    const explicitWord = new RegExp(`\\\\b${word}\\\\s*(?:personnes?|pers|couverts?)\\\\b`, 'i');\n    if (explicitWord.test(cleanText)) return value;\n\n    const tableWord = new RegExp(`\\\\btable\\\\s+(?:de|pour)\\\\s+${word}\\\\b`, 'i');\n    if (tableWord.test(cleanText)) return value;\n\n    const peopleWord = new RegExp(`\\\\b(?:nous serons|on sera|nous sommes|on est)\\\\s+${word}\\\\b`, 'i');\n    if (peopleWord.test(cleanText)) return value;\n  }\n\n  return null;\n}\n\nfunction parseTime(text) {\n  if (!text) return null;\n\n  const cleanText = text.toLowerCase();\n\n  let match = cleanText.match(/\\b(\\d{1,2})h(\\d{2})?\\b/i);\n  if (match) {\n    const hour = String(match[1]).padStart(2, '0');\n    const minute = String(match[2] || '00').padStart(2, '0');\n    return `${hour}:${minute}:00`;\n  }\n\n  match = cleanText.match(/\\b(\\d{1,2})[:.](\\d{2})\\b/i);\n  if (match) {\n    const hour = String(match[1]).padStart(2, '0');\n    const minute = String(match[2]).padStart(2, '0');\n    return `${hour}:${minute}:00`;\n  }\n\n  if (cleanText.includes('midi trente')) return '12:30:00';\n  if (cleanText.includes('midi')) return '12:00:00';\n\n  // \"mercredi soir\", \"dimanche soir\", \"ce soir\", etc.\n  if (cleanText.includes('soir')) return '20:00:00';\n\n  if (cleanText.includes('déjeuner') || cleanText.includes('dejeuner')) return '12:00:00';\n  if (cleanText.includes('dîner') || cleanText.includes('diner')) return '20:00:00';\n\n  return null;\n}\n\nfunction getParisNow(timezone = 'Europe/Paris') {\n  return new Date(\n    new Date().toLocaleString('en-US', { timeZone: timezone })\n  );\n}\n\nfunction getTimezoneOffsetString(date, timezone = 'Europe/Paris') {\n  try {\n    const parts = new Intl.DateTimeFormat('en-US', {\n      timeZone: timezone,\n      timeZoneName: 'shortOffset'\n    }).formatToParts(date);\n\n    const tz = parts.find(p => p.type === 'timeZoneName')?.value || 'GMT+1';\n    const match = tz.match(/GMT([+-])(\\d{1,2})(?::(\\d{2}))?/);\n\n    if (!match) return '+01:00';\n\n    const sign = match[1];\n    const hour = String(match[2]).padStart(2, '0');\n    const minute = String(match[3] || '00').padStart(2, '0');\n\n    return `${sign}${hour}:${minute}`;\n  } catch (e) {\n    return '+01:00';\n  }\n}\n\nfunction getNextWeekdayDate(baseDate, weekdayName) {\n  const days = {\n    'dimanche': 0,\n    'lundi': 1,\n    'mardi': 2,\n    'mercredi': 3,\n    'jeudi': 4,\n    'vendredi': 5,\n    'samedi': 6\n  };\n\n  const targetDay = days[weekdayName];\n  if (targetDay === undefined) return null;\n\n  const result = new Date(baseDate);\n  const currentDay = result.getDay();\n\n  let diff = targetDay - currentDay;\n\n  // Si le jour est aujourd’hui ou déjà passé, on prend le prochain.\n  if (diff <= 0) {\n    diff += 7;\n  }\n\n  result.setDate(result.getDate() + diff);\n\n  return result;\n}\n\nfunction buildDatetime(text, timezone = 'Europe/Paris') {\n  if (!text) return null;\n\n  const cleanText = text.toLowerCase();\n  const time = parseTime(cleanText);\n\n  // Si pas d’heure exploitable, on ne fabrique pas de fausse date complète.\n  if (!time) return null;\n\n  const now = getParisNow(timezone);\n  let target = new Date(now);\n\n  const months = {\n    'janvier': 0,\n    'février': 1,\n    'fevrier': 1,\n    'mars': 2,\n    'avril': 3,\n    'mai': 4,\n    'juin': 5,\n    'juillet': 6,\n    'août': 7,\n    'aout': 7,\n    'septembre': 8,\n    'octobre': 9,\n    'novembre': 10,\n    'décembre': 11,\n    'decembre': 11\n  };\n\n  // \"mercredi 17 juin\", \"17 juin\"\n  const explicitDate = cleanText.match(/\\b(?:dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi)?\\s*(\\d{1,2})\\s+(janvier|février|fevrier|mars|avril|mai|juin|juillet|août|aout|septembre|octobre|novembre|décembre|decembre)\\b/i);\n\n  if (explicitDate) {\n    const day = Number(explicitDate[1]);\n    const month = months[explicitDate[2].toLowerCase()];\n    let year = now.getFullYear();\n\n    target = new Date(now);\n    target.setFullYear(year, month, day);\n\n    // Si la date est déjà passée, on prend l’année suivante.\n    if (target < now) {\n      target.setFullYear(year + 1, month, day);\n    }\n  } else {\n    const weekdayMatch = cleanText.match(/\\b(dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi)\\b/i);\n\n    if (weekdayMatch) {\n      const weekday = weekdayMatch[1].toLowerCase();\n      target = getNextWeekdayDate(now, weekday) || target;\n    } else if (cleanText.includes('demain')) {\n      target.setDate(target.getDate() + 1);\n    } else if (cleanText.includes('ce soir')) {\n      // aujourd’hui\n    }\n  }\n\n  const yyyy = target.getFullYear();\n  const mm = String(target.getMonth() + 1).padStart(2, '0');\n  const dd = String(target.getDate()).padStart(2, '0');\n\n  const offset = getTimezoneOffsetString(target, timezone);\n\n  return `${yyyy}-${mm}-${dd}T${time}${offset}`;\n}\n\nfunction hasDateWithoutTime(text) {\n  if (!text) return false;\n\n  const cleanText = text.toLowerCase();\n\n  const hasDate =\n    /\\b(demain|dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi|\\d{1,2}\\s+(janvier|février|fevrier|mars|avril|mai|juin|juillet|août|aout|septembre|octobre|novembre|décembre|decembre))\\b/i.test(cleanText);\n\n  const hasTime = !!parseTime(cleanText);\n\n  return hasDate && !hasTime;\n}\n\nfunction parseFullName(text, previousState) {\n  if (!text) return null;\n\n  const cleanText = text.trim();\n\n  // Cas explicites :\n  // \"au nom de Jeremy\"\n  // \"nom de Jeremy\"\n  // \"réservation au nom de Jeremy\"\n  const match = cleanText.match(/\\b(?:au nom de|nom de|pour le nom|réservation au nom de)\\s+([a-zA-ZÀ-ÿ' -]{2,60})$/i);\n  if (match) {\n    return match[1].trim();\n  }\n\n  const waitingForName =\n    Array.isArray(previousState.missing_fields) &&\n    previousState.missing_fields.includes('full_name');\n\n  const stageWaitingName =\n    previousState.stage === 'collecting_information' ||\n    previousState.stage === 'waiting_user';\n\n  const looksLikeOnlyName =\n    /^[a-zA-ZÀ-ÿ' -]{2,40}$/.test(cleanText) &&\n    cleanText.split(/\\s+/).length <= 3;\n\n  const forbiddenWords = [\n    'bonjour',\n    'salut',\n    'hello',\n    'oui',\n    'non',\n    'ok',\n    'okay',\n    'je confirme',\n    'confirmé',\n    'confirme',\n    'c’est bon',\n    \"c'est bon\",\n    'c’est ça',\n    \"c'est ça\",\n    'exactement',\n    'parfait',\n    'merci',\n    'validé',\n    'valide',\n    'c’est correct',\n    \"c'est correct\",\n    'annuler',\n    'annule'\n  ];\n\n  const lower = cleanText.toLowerCase();\n\n  if (\n    (waitingForName || stageWaitingName) &&\n    looksLikeOnlyName &&\n    !forbiddenWords.includes(lower)\n  ) {\n    return cleanText;\n  }\n\n  return null;\n}\n\nfunction parseSpecialRequest(text) {\n  if (!text) return null;\n\n  const cleanText = text.toLowerCase();\n  const requests = [];\n\n  if (cleanText.includes('terrasse')) {\n    requests.push('Table en terrasse');\n  }\n\n  if (cleanText.includes('anniversaire')) {\n    requests.push('Anniversaire');\n  }\n\n  if (cleanText.includes('chaise bébé') || cleanText.includes('chaise bebe')) {\n    requests.push('Chaise bébé');\n  }\n\n  if (cleanText.includes('allergie')) {\n    requests.push('Allergie signalée');\n  }\n\n  if (cleanText.includes('calme')) {\n    requests.push('Table au calme');\n  }\n\n  if (cleanText.includes('enfant') || cleanText.includes('enfants')) {\n    requests.push('Présence d’enfant(s)');\n  }\n\n  return requests.length > 0 ? requests.join(', ') : null;\n}\n\nfunction isNewReservationRequest(text) {\n  if (!text) return false;\n\n  const cleanText = text.toLowerCase();\n\n  const hasReservationIntent =\n    /\\b(réserver|reserver|réservation|reservation|table|manger|déjeuner|dejeuner|dîner|diner)\\b/i.test(cleanText);\n\n  const hasModificationIntent =\n    /\\b(modifier|changer|décaler|decaler|annuler|déplacer|deplacer|remplacer|finalement|plutôt|plutot|au lieu de)\\b/i.test(cleanText);\n\n  const hasDateOrTimeOrParty =\n    /\\b(ce soir|demain|dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi|\\d{1,2}h|\\d{1,2}:\\d{2}|\\d{1,2}\\s*(personnes?|pers|couverts?)|un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix)\\b/i.test(cleanText);\n\n  return hasReservationIntent && hasDateOrTimeOrParty && !hasModificationIntent;\n}\n\nfunction formatDateHumanFr(iso, timezone = 'Europe/Paris') {\n  if (!iso) return null;\n\n  const d = new Date(iso);\n\n  const date = d.toLocaleDateString('fr-FR', {\n    weekday: 'long',\n    day: '2-digit',\n    month: 'long',\n    year: 'numeric',\n    timeZone: timezone\n  });\n\n  const time = d.toLocaleTimeString('fr-FR', {\n    hour: '2-digit',\n    minute: '2-digit',\n    timeZone: timezone\n  });\n\n  return `${date} à ${time}`;\n}\n\nlet payload = null;\nlet parse_error = null;\nlet raw = $json;\n\ntry {\n  let value = $json.output ?? $json.text ?? $json.response ?? $json;\n\n  if (typeof value === 'string') {\n    value = extractFirstJsonObject(value);\n    payload = JSON.parse(value);\n  } else if (typeof value === 'object' && value !== null) {\n    if (typeof value.output === 'string') {\n      const cleaned = extractFirstJsonObject(value.output);\n      payload = JSON.parse(cleaned);\n    } else if (typeof value.output === 'object' && value.output !== null) {\n      payload = value.output;\n    } else {\n      payload = value;\n    }\n  }\n} catch (e) {\n  parse_error = e.message;\n}\n\nconst previousState = sessionContext.session_state || {};\nconst extracted = payload?.extracted_data ?? {};\n\nconst message =\n  sessionContext.user_message ||\n  sessionContext.raw_message ||\n  sessionContext.message ||\n  '';\n\nconst newReservationRequest = isNewReservationRequest(message);\n\nconst parsedDatetime = buildDatetime(\n  message,\n  sessionContext.timezone ?? 'Europe/Paris'\n);\n\nconst parsedPartySize = parsePartySize(message);\n\nconst parsedFullName = parseFullName(message, previousState);\n\nconst parsedSpecialRequest = parseSpecialRequest(message);\n\nconst dateWithoutTime = hasDateWithoutTime(message);\n\n// Nouvelle réservation : on réinitialise date/personnes/demande spéciale.\n// Mais on conserve le nom connu du client.\nconst requested_datetime = newReservationRequest\n  ? keepNewOrPrevious(extracted.requested_datetime ?? parsedDatetime, null)\n  : keepNewOrPrevious(extracted.requested_datetime ?? parsedDatetime, previousState.requested_datetime);\n\nconst party_size = newReservationRequest\n  ? keepNewOrPrevious(extracted.party_size ?? parsedPartySize, null)\n  : keepNewOrPrevious(extracted.party_size ?? parsedPartySize, previousState.party_size);\n\nconst full_name = keepNewOrPrevious(\n  extracted.full_name ?? parsedFullName,\n  previousState.full_name\n);\n\nconst phone = keepNewOrPrevious(\n  extracted.phone,\n  previousState.phone\n);\n\nconst email = keepNewOrPrevious(\n  extracted.email,\n  previousState.email\n);\n\nconst special_request = newReservationRequest\n  ? keepNewOrPrevious(extracted.special_request ?? parsedSpecialRequest, null)\n  : keepNewOrPrevious(extracted.special_request ?? parsedSpecialRequest, previousState.special_request);\n\nconst missing_fields = [];\n\nif (!requested_datetime) missing_fields.push('requested_datetime');\nif (!party_size) missing_fields.push('party_size');\nif (!full_name) missing_fields.push('full_name');\n\nlet reply =\n  payload?.reply ??\n  \"Bonjour, pouvez-vous me préciser la date, l’heure et le nombre de personnes pour votre réservation ?\";\n\nconst greetingName = full_name ? ` ${full_name}` : '';\n\n// Cas : date repérée mais heure manquante\nif (!requested_datetime && party_size && dateWithoutTime) {\n  reply =\n`Bonjour${greetingName}, j’ai bien noté votre demande pour ${party_size} personne${Number(party_size) > 1 ? 's' : ''}${special_request ? `\\n📝 Demande : ${special_request}` : ''}.\n\nIl me manque juste l’heure souhaitée pour finaliser la demande.`;\n}\n\n// Cas : date/heure OK + nombre OK, mais nom manquant\nif (requested_datetime && party_size && !full_name) {\n  reply =\n`Très bien, j’ai noté votre demande.\n\n📅 Date : ${formatDateHumanFr(requested_datetime, sessionContext.timezone ?? 'Europe/Paris')}\n👥 Nombre de personnes : ${party_size}${special_request ? `\\n📝 Demande : ${special_request}` : ''}\n\nÀ quel nom dois-je mettre la réservation ?`;\n}\n\n// Cas : tout est OK\nif (requested_datetime && party_size && full_name) {\n  const humanDate = formatDateHumanFr(\n    requested_datetime,\n    sessionContext.timezone ?? 'Europe/Paris'\n  );\n\n  reply =\n`Bonjour${greetingName}, je récapitule votre réservation :\n\n📅 Date : ${humanDate}\n👤 Nom : ${full_name}\n👥 Nombre de personnes : ${party_size}${special_request ? `\\n📝 Demande : ${special_request}` : ''}\n\nPouvez-vous confirmer ?`;\n}\n\nreturn [\n  {\n    json: {\n      telegram_chat_id:\n        sessionContext.telegram_chat_id ??\n        sessionContext.to ??\n        sessionContext.from ??\n        null,\n\n      reply,\n      decision: missing_fields.length > 0 ? 'need_followup' : 'ready_to_check_availability',\n      needs_followup: missing_fields.length > 0,\n\n      missing_fields,\n\n      special_requests: Array.isArray(payload?.special_requests)\n        ? payload.special_requests\n        : [],\n\n      requested_datetime,\n      party_size,\n      full_name,\n      phone,\n      email,\n      special_request,\n\n      restaurant_id: sessionContext.restaurant_id ?? null,\n      restaurant_name: sessionContext.restaurant_name ?? null,\n      restaurant_slug: sessionContext.restaurant_slug ?? null,\n      timezone: sessionContext.timezone ?? 'Europe/Paris',\n      default_meal_duration_minutes: sessionContext.default_meal_duration_minutes ?? 120,\n      cleaning_buffer_minutes: sessionContext.cleaning_buffer_minutes ?? 15,\n      max_party_size: sessionContext.max_party_size ?? 12,\n\n      source: sessionContext.source ?? null,\n      channel: sessionContext.channel ?? null,\n      to: sessionContext.to ?? null,\n      from: sessionContext.from ?? null,\n      phone_input: sessionContext.phone ?? null,\n\n      message,\n      raw_message: message,\n\n      booking_policy: sessionContext.booking_policy ?? null,\n      event_notification_policy: sessionContext.event_notification_policy ?? null,\n      conversation_id: sessionContext.conversation_id ?? null,\n      session_state: previousState,\n\n      parser_ok: !!payload?.reply,\n      parse_error,\n\n      new_reservation_request: newReservationRequest,\n      date_without_time: dateWithoutTime,\n\n      manual_datetime_parser_used: !!parsedDatetime,\n      manual_party_size_parser_used: !!parsedPartySize,\n      manual_full_name_parser_used: !!parsedFullName,\n      manual_special_request_parser_used: !!parsedSpecialRequest,\n\n      parsed_full_name: parsedFullName,\n      parsed_special_request: parsedSpecialRequest,\n\n      raw_agent_output: raw,\n      parsed_agent_payload: payload\n    }\n  }\n];"
+      },
+      "id": "9ccf4eb7-e83f-46c6-b9ef-59ac07939c36",
+      "name": "Normalize Agent Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3184,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const dt = $json.requested_datetime;\nreturn [{ json: { ...$json, requested_datetime: (dt === null || dt === undefined || dt === '' || dt === 'null') ? null : dt } }];"
+      },
+      "id": "81ef5ac1-504f-4ab6-b679-770b3ff47735",
+      "name": "Normalize Datetime",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3392,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "39a8202f-2e38-4b04-9f51-d2483372a398",
+              "leftValue": "={{ $json.has_requested_datetime }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "looseTypeValidation": true
+        }
+      },
+      "id": "004d64dc-197f-4b35-bcdb-26d05e5098a9",
+      "name": "Has requested_datetime?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3824,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  EXISTS (\n    SELECT 1\n    FROM restaurant_closures\n    WHERE restaurant_id = {{ $json.restaurant_id }}\n      AND is_active = true\n      AND starts_at <= '{{ $json.requested_datetime }}'::timestamptz\n      AND ends_at > '{{ $json.requested_datetime }}'::timestamptz\n  ) AS is_closed,\n  (\n    SELECT reason\n    FROM restaurant_closures\n    WHERE restaurant_id = {{ $json.restaurant_id }}\n      AND is_active = true\n      AND starts_at <= '{{ $json.requested_datetime }}'::timestamptz\n      AND ends_at > '{{ $json.requested_datetime }}'::timestamptz\n    ORDER BY starts_at DESC\n    LIMIT 1\n  ) AS closure_reason;",
+        "options": {}
+      },
+      "id": "17012c33-16ca-4433-ba11-89190e45dcd6",
+      "name": "Check Closure",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        4208,
+        128
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const agent = $json;\n\nreturn [{\n  json: {\n    decision: 'need_followup',\n    reply: agent.reply,\n    needs_followup: true,\n    missing_fields: agent.missing_fields ?? ['requested_datetime', 'party_size'],\n    special_requests: agent.special_requests ?? [],\n\n    restaurant_id: agent.restaurant_id,\n    restaurant_name: agent.restaurant_name,\n    restaurant_slug: agent.restaurant_slug,\n    timezone: agent.timezone,\n\n    requested_datetime: null,\n    party_size: agent.party_size ?? null,\n    full_name: agent.full_name ?? null,\n    phone: agent.phone ?? null,\n    email: agent.email ?? null,\n    special_request: agent.special_request ?? null,\n\n    source: agent.source,\n    channel: agent.channel,\n    to: agent.to,\n    from: agent.from,\n    telegram_chat_id: agent.telegram_chat_id ?? null,\n\n    phone_input: agent.phone_input,\n    message: agent.message,\n    raw_message: agent.raw_message,\n    conversation_id: agent.conversation_id,\n    session_state: agent.session_state\n  }\n}];"
+      },
+      "id": "91eb27fc-e88b-4b6d-bc68-3d56e50dbd16",
+      "name": "Follow-up Without Datetime",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4880,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM clients\nWHERE restaurant_id = {{ $json.restaurant_id ?? 1 }}\nAND (\n  ('{{ $json.from ?? \"\" }}' <> '' AND phone = '{{ $json.from ?? \"\" }}')\n  OR\n  ('{{ $json.email ?? \"\" }}' <> '' AND email = '{{ $json.email ?? \"\" }}')\n)\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "8ea3af0f-d1b0-41ec-ad5b-1bdbe46b7a7d",
+      "name": "Find Client",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        4736,
+        128
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO clients (\n  restaurant_id,\n  full_name,\n  phone,\n  email,\n  is_new_customer,\n  consent_notifications,\n  consent_marketing,\n  created_at,\n  updated_at\n)\nVALUES (\n  {{$json.restaurant_id}},\n  COALESCE(NULLIF('{{$json.full_name || \"\"}}', ''), 'Client'),\n  NULLIF('{{$json.phone_input || \"\"}}', ''),\n  NULLIF('{{$json.email || \"\"}}', ''),\n  TRUE,\n  TRUE,\n  FALSE,\n  NOW(),\n  NOW()\n)\nRETURNING *;",
+        "options": {}
+      },
+      "id": "4a090102-1bc0-4a44-bc80-4f8133418d9d",
+      "name": "Create Client",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        5280,
+        368
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO conversation_sessions (\n  restaurant_id,\n  conversation_id,\n  telegram_chat_id,\n  state,\n  last_message,\n  last_agent_reply,\n  status,\n  updated_at,\n  created_at\n)\nVALUES (\n  {{ $json.restaurant_id_sql }},\n  {{ $json.conversation_id_sql }},\n  {{ $json.telegram_chat_id_sql }},\n  {{ $json.state_sql }},\n  {{ $json.last_message_sql }},\n  {{ $json.last_agent_reply_sql }},\n  {{ $json.status_sql }},\n  NOW(),\n  NOW()\n)\nON CONFLICT (restaurant_id, conversation_id)\nDO UPDATE SET\n  telegram_chat_id = COALESCE(EXCLUDED.telegram_chat_id, conversation_sessions.telegram_chat_id),\n  state = EXCLUDED.state,\n  last_message = EXCLUDED.last_message,\n  last_agent_reply = EXCLUDED.last_agent_reply,\n  status = EXCLUDED.status,\n  updated_at = NOW()\nRETURNING *;",
+        "options": {}
+      },
+      "id": "5f0c25bd-44e9-4f26-83db-d8583ed33e16",
+      "name": "Upsert Conversation Session",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        6064,
+        624
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\nreturn [{\n  json: {\n    ...input,\n    restaurant_id: input.restaurant_id ?? null,\n    conversation_id: input.conversation_id ?? null\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        224
+      ],
+      "id": "086d0332-fc10-4c98-9ace-ef8c49eff3ff",
+      "name": "Prepare Session Lookup"
+    },
+    {
+      "parameters": {
+        "jsCode": "const dt = $json.requested_datetime;\nconst state = $json.session_state || {};\n\nconst finalDatetime =\n  dt && dt !== 'null' && dt !== ''\n    ? dt\n    : state.requested_datetime ?? null;\n\nreturn [{\n  json: {\n    ...$json,\n    requested_datetime: finalDatetime,\n    has_requested_datetime:\n      finalDatetime !== null &&\n      finalDatetime !== undefined &&\n      finalDatetime !== '' &&\n      finalDatetime !== 'null'\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3616,
+        80
+      ],
+      "id": "abc24de2-1680-43a9-9fb3-ab9e62423442",
+      "name": "Prepare Has Datetime"
+    },
+    {
+      "parameters": {
+        "jsCode": "const dt = $json.requested_datetime;\n\nconst has_requested_datetime =\n  dt !== null &&\n  dt !== undefined &&\n  dt !== '' &&\n  dt !== 'null';\n\nreturn [{\n  json: {\n    ...$json,\n    has_requested_datetime,\n    telegram_chat_id: $json.telegram_chat_id ?? null,\n    reply: $json.reply ?? 'Bonjour'\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4016,
+        128
+      ],
+      "id": "f9fa13fe-51ed-45eb-a699-3452eb8d2766",
+      "name": "Before Check Closure"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        816
+      ],
+      "id": "645c0229-a80c-4f59-8c77-9aa9b33e4e60",
+      "name": "Telegram Inbound",
+      "webhookId": "93de50db-fd71-48f2-97e6-aeda23674e94",
+      "credentials": {
+        "telegramApi": {
+          "id": "9YijlRwdUvPETdUi",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.telegram_chat_id || $json.to || $json.from }}",
+        "text": "={{ $json.last_agent_reply || $json.reply }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        5184,
+        1056
+      ],
+      "id": "44d8133b-a84a-4a02-8181-e73d7a3b4495",
+      "name": "Send a text message",
+      "webhookId": "f65933a3-2ea3-44eb-bb6e-0c3cb7b64c4f",
+      "credentials": {
+        "telegramApi": {
+          "id": "9YijlRwdUvPETdUi",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Contexte restaurant:\n{{ JSON.stringify({\n  restaurant_id: $json.restaurant_id,\n  restaurant_name: $json.restaurant_name,\n  restaurant_slug: $json.restaurant_slug,\n  timezone: $json.timezone,\n  default_meal_duration_minutes: $json.default_meal_duration_minutes,\n  cleaning_buffer_minutes: $json.cleaning_buffer_minutes,\n  max_party_size: $json.max_party_size,\n  booking_policy: $json.booking_policy,\n  event_notification_policy: $json.event_notification_policy\n}) }}\n\nÉtat précédent:\n{{ JSON.stringify($json.session_state || {}) }}\n\nNouveau message client:\n{{ $json.user_message || $json.raw_message || $json.message || '' }}\n\nAujourd’hui:\n{{ $now.toISO() }}\n\nFuseau horaire du restaurant:\n{{ $json.timezone }}\n\nRéponds uniquement en JSON strict selon le schéma attendu.\n\nSi le message client contient déjà la date et le nombre de personnes, ne les redemande pas.\nPour \"demain midi\", interprète \"midi\" comme 12:00.\nPour \"demain soir\", interprète \"soir\" comme 20:00 sauf indication contraire.\nPour \"ce soir\", utilise la date du jour à 20:00 sauf indication contraire.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Tu es l’agent conversationnel de réservation du restaurant {{ $json.restaurant_name }}.\n\nTon rôle est de discuter naturellement avec le client pour l’aider à réserver une table.\n\nTu dois tenir compte :\n\n* du nouveau message client ;\n* de l’état précédent de la conversation ;\n* des informations déjà connues ;\n* du fuseau horaire du restaurant ;\n* de la politique de réservation du restaurant ;\n* du canal de réception du message.\n\nRègles de conversation :\n\n* Au premier échange, présente-toi brièvement comme l’agent de réservation du restaurant.\n* Ne répète pas toujours la même phrase.\n* Ne redemande jamais une information déjà connue dans l’état précédent.\n* Pose une seule question utile à la fois, sauf si le client vient de commencer la conversation.\n* Si le client donne plusieurs informations dans le même message, extrais-les toutes.\n* Si le client dit “demain midi”, “demain soir”, “ce soir”, “vendredi”, “vers 20h”, convertis en date ISO 8601 quand c’est suffisamment clair.\n* Si la date est ambiguë, demande une précision.\n* Si le nombre de personnes manque, demande-le.\n* Si la date ou l’heure manque, demande-la.\n* Si le nom manque au moment de finaliser la demande, demande-le.\n* Ne confirme jamais définitivement une réservation tant que la disponibilité n’a pas été vérifiée par le workflow.\n* Si toutes les informations nécessaires sont présentes, mets decision = \"ready_to_check_availability\".\n* Mets decision = \"confirm\" uniquement si le workflow a déjà vérifié la disponibilité et que le client confirme explicitement.\n* Reste poli, naturel, court et professionnel.\n* Réponds dans la langue du message reçu, sinon en français.\n\nDans le contexte restaurant, les mots comme \"pizza\", \"table\", \"manger\", \"dîner\", \"déjeuner\" doivent être compris comme une intention de réservation si le client donne une date, une heure ou un nombre de personnes.\n\nExemples :\n- \"Je voudrais une pizza pour deux ce soir à 18h45\" signifie une réservation pour 2 personnes aujourd’hui à 18h45.\n- \"19h ce soir\" signifie aujourd’hui à 19h00.\n- \"pour deux\" signifie party_size = 2.\n- \"pour trois personnes\" signifie party_size = 3.\n\nGestion des corrections :\n\n* Si le client corrige une information précédente, mets à jour l’état existant.\n* “midi” signifie 12:00.\n* “midi trente” signifie 12:30.\n* “demain midi” signifie demain à 12:00 dans le fuseau horaire du restaurant.\n* “demain soir” signifie demain à 20:00 sauf indication contraire.\n* “ce soir” signifie aujourd’hui à 20:00 sauf indication contraire.\n* “au nom de Jérôme” signifie full_name = \"Jérôme\".\n* Si une date existait déjà et que le client corrige seulement l’heure, conserve la date précédente.\n* Si une heure existait déjà et que le client corrige seulement la date, conserve l’heure précédente.\n* Si un nombre de personnes existait déjà et que le client ne le corrige pas, conserve-le.\n* Si le client dit “pour trois personnes”, remplace party_size par 3.\n* Si le client dit “finalement”, “pardon”, “plutôt”, “je voulais dire”, ou “au lieu de”, considère que c’est une correction.\n* Ne réponds jamais que tu n’as pas compris si le message contient une correction exploitable.\n\nInformations minimales nécessaires pour vérifier une disponibilité :\n\n* requested_datetime\n* party_size\n* full_name si possible\n\nInformations de contact :\n\n* Sur Telegram, le téléphone ou l’email ne sont pas obligatoires si telegram_chat_id est disponible.\n* Demande un téléphone ou un email uniquement si la politique du restaurant l’exige ou si le canal ne permet pas de recontacter le client.\n* Si le client donne un téléphone ou un email, extrais-le.\n\nMémoire de conversation :\n- Si une information existe déjà dans l’état précédent, conserve-la sauf si le client la corrige explicitement.\n- Si full_name existe déjà dans l’état précédent et que le client ne donne pas un autre nom, conserve full_name.\n- Si le client dit seulement “c’est bon”, “oui”, “ok”, “je confirme”, utilise les informations déjà connues dans l’état précédent.\n- Ne redemande jamais le nom si full_name existe déjà.\n- Ne redemande jamais la date ou le nombre de personnes si requested_datetime et party_size existent déjà.\n\nFormat de sortie obligatoire :\nTu dois répondre uniquement avec un objet JSON valide.\nNe retourne jamais de markdown.\nNe retourne jamais de bloc ```json.\nNe retourne jamais de texte avant ou après le JSON.\nNe retourne jamais une clé racine \"output\".\nNe retourne jamais de champs supplémentaires.\n\nLes seuls champs autorisés au niveau racine sont :\n\n* decision\n* reply\n* needs_followup\n* missing_fields\n* special_requests\n* extracted_data\n\nLe champ decision doit être une des valeurs suivantes :\n\n* need_followup\n* ready_to_check_availability\n* confirm\n* unavailable\n* cancel\n* unknown\n* technical_error\n\nLe champ needs_followup doit être un booléen true ou false.\n\nLe champ missing_fields doit toujours être un tableau, même vide.\n\nLe champ special_requests doit toujours être un tableau, même vide.\n\nLe champ extracted_data doit toujours contenir exactement :\n\n* requested_datetime\n* party_size\n* full_name\n* phone\n* email\n* special_request\n\nRègles de typage :\n\n* requested_datetime doit être une date ISO 8601 ou null.\n* party_size doit être un nombre ou null.\n* full_name doit être une chaîne ou null.\n* phone doit être une chaîne ou null.\n* email doit être une chaîne ou null.\n* special_request doit être une chaîne ou null.\n* Si une valeur est inconnue, utilise null.\n* N’utilise jamais undefined.\n* N’utilise jamais NaN.\n* N’utilise jamais une date approximative en texte dans requested_datetime.\n\nExemple de sortie valide :\n\n{\n\"decision\": \"need_followup\",\n\"reply\": \"Bonjour, je suis l’agent de réservation du restaurant. Très bien pour demain midi pour 2 personnes. Puis-je avoir votre nom pour la réservation ?\",\n\"needs_followup\": true,\n\"missing_fields\": [\"full_name\"],\n\"special_requests\": [],\n\"extracted_data\": {\n\"requested_datetime\": \"2026-06-15T12:00:00+02:00\",\n\"party_size\": 2,\n\"full_name\": null,\n\"phone\": null,\n\"email\": null,\n\"special_request\": null\n}\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2864,
+        272
+      ],
+      "id": "635e07f6-516b-4bf8-ab0f-1d087bce485a",
+      "name": "Agent Conversationnel Restau",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const s = $('Upsert Conversation Session').item.json;\n\nreturn [{\n  json: {\n    telegram_chat_id: s.telegram_chat_id,\n    conversation_id: s.conversation_id,\n    restaurant_id: s.restaurant_id,\n    reply_to_send: s.last_agent_reply,\n    state: s.state,\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6256,
+        624
+      ],
+      "id": "2eb318e9-4b53-45d7-827c-57e7a686b213",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE conversation_sessions\nSET state = jsonb_set(state, '{stage}', '\"waiting_user\"'),\n    updated_at = NOW()\nWHERE restaurant_id = {{ $json.restaurant_id }}\n  AND conversation_id = '{{ $json.conversation_id }}'\nRETURNING *;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        6448,
+        624
+      ],
+      "id": "3b5f3379-71e0-4209-b045-eea1adae12bd",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      telegram_chat_id: $('Normalize Input').item.json.telegram_chat_id,\n      last_agent_reply: \"Bonjour, je n’arrive pas à identifier le restaurant associé à ce canal. Pouvez-vous vérifier la configuration ou préciser le restaurant concerné ?\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2672,
+        816
+      ],
+      "id": "0d81aa4d-df24-48c9-b87e-1c01c0ac08ad",
+      "name": "Build Restaurant Not Found Reply"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nconst previousState = input.session_state || {};\n\nfunction keepNewOrPrevious(newValue, oldValue) {\n  if (newValue === undefined || newValue === null || newValue === '' || newValue === 'null') {\n    return oldValue ?? null;\n  }\n  return newValue;\n}\n\nconst extracted = {\n  requested_datetime: keepNewOrPrevious(input.requested_datetime, previousState.requested_datetime),\n  party_size: keepNewOrPrevious(input.party_size, previousState.party_size),\n  full_name: keepNewOrPrevious(input.full_name, previousState.full_name),\n  phone: keepNewOrPrevious(input.phone ?? input.phone_input, previousState.phone),\n  email: keepNewOrPrevious(input.email, previousState.email),\n  special_request: keepNewOrPrevious(input.special_request, previousState.special_request),\n};\n\nconst missingFields = [];\n\nif (!extracted.requested_datetime) {\n  missingFields.push('requested_datetime');\n}\n\nif (!extracted.party_size) {\n  missingFields.push('party_size');\n}\n\nif (!extracted.full_name) {\n  missingFields.push('full_name');\n}\n\nconst stage = missingFields.length > 0 ? 'collecting_information' : 'ready_to_check_availability';\n\nconst state = {\n  ...previousState,\n  ...extracted,\n  missing_fields: missingFields,\n  stage,\n  last_intent: input.decision ?? 'need_followup',\n  updated_at: new Date().toISOString()\n};\n\nfunction sqlString(value) {\n  if (value === null || value === undefined) return 'NULL';\n  return `'${String(value).replace(/'/g, \"''\")}'`;\n}\n\nfunction sqlJson(value) {\n  return `'${JSON.stringify(value).replace(/'/g, \"''\")}'::jsonb`;\n}\n\nreturn [\n  {\n    json: {\n      ...input,\n      state,\n      state_sql: sqlJson(state),\n      restaurant_id_sql: Number(input.restaurant_id),\n      conversation_id_sql: sqlString(input.conversation_id),\n      telegram_chat_id_sql: sqlString(input.telegram_chat_id),\n      last_message_sql: sqlString(input.message || input.raw_message || ''),\n      last_agent_reply_sql: sqlString(input.reply || 'Bonjour, comment puis-je vous aider pour votre réservation ?'),\n      status_sql: sqlString('active')\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5856,
+        496
+      ],
+      "id": "8951228c-ff21-4bcd-b8ec-5d28127ea80b",
+      "name": "Build Conversation State"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nconst state = input.state || input.session_state || {};\n\nconst restaurantName =\n  input.restaurant_name ||\n  state.restaurant_name ||\n  'Thysiane House';\n\nconst fullName =\n  input.full_name ||\n  state.full_name ||\n  null;\n\nconst requestedDatetime =\n  input.requested_datetime ||\n  state.requested_datetime ||\n  null;\n\nconst partySize =\n  input.party_size ||\n  state.party_size ||\n  null;\n\nfunction formatDateFr(iso) {\n  if (!iso) return null;\n\n  const d = new Date(iso);\n  const date = d.toLocaleDateString('fr-FR', {\n    weekday: 'long',\n    day: '2-digit',\n    month: 'long',\n    timeZone: 'Europe/Paris'\n  });\n\n  const time = d.toLocaleTimeString('fr-FR', {\n    hour: '2-digit',\n    minute: '2-digit',\n    timeZone: 'Europe/Paris'\n  });\n\n  return `${date} à ${time}`;\n}\n\nconst dateFr = formatDateFr(requestedDatetime);\n\nlet finalReply = input.reply;\n\nconst hasAllRequired =\n  fullName &&\n  requestedDatetime &&\n  partySize;\n\nconst isAvailable =\n  input.is_available === true ||\n  input.availability_status === 'available' ||\n  input.is_closed === false;\n\nif (hasAllRequired && isAvailable) {\n  finalReply = `Réservation OK pour ${fullName} pour ${dateFr} pour ${partySize} personne${Number(partySize) > 1 ? 's' : ''} au restaurant ${restaurantName}.`;\n}\n\nreturn [\n  {\n    json: {\n      ...input,\n      reply: finalReply,\n      last_agent_reply: finalReply,\n      full_name: fullName,\n      requested_datetime: requestedDatetime,\n      party_size: partySize,\n      restaurant_name: restaurantName\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4560,
+        128
+      ],
+      "id": "7a29e887-491f-4454-9edc-bd4d4dbec3de",
+      "name": "Build Final Reservation Reply",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('Before Check Closure').item.json;\nconst closure = $('Check Closure').item.json || {};\n\nconst state = base.session_state || {};\n\nfunction keepNewOrPrevious(newValue, oldValue) {\n  if (\n    newValue === undefined ||\n    newValue === null ||\n    newValue === '' ||\n    newValue === 'null'\n  ) {\n    return oldValue ?? null;\n  }\n\n  return newValue;\n}\n\nfunction formatDateHumanFr(iso, timezone = 'Europe/Paris') {\n  if (!iso) return null;\n\n  const d = new Date(iso);\n\n  const date = d.toLocaleDateString('fr-FR', {\n    weekday: 'long',\n    day: '2-digit',\n    month: 'long',\n    year: 'numeric',\n    timeZone: timezone\n  });\n\n  const time = d.toLocaleTimeString('fr-FR', {\n    hour: '2-digit',\n    minute: '2-digit',\n    timeZone: timezone\n  });\n\n  return `${date} à ${time}`;\n}\n\nconst requested_datetime = keepNewOrPrevious(\n  base.requested_datetime,\n  state.requested_datetime\n);\n\nconst party_size = keepNewOrPrevious(\n  base.party_size,\n  state.party_size\n);\n\nconst full_name = keepNewOrPrevious(\n  base.full_name,\n  state.full_name\n);\n\nconst phone = keepNewOrPrevious(\n  base.phone,\n  state.phone\n);\n\nconst email = keepNewOrPrevious(\n  base.email,\n  state.email\n);\n\nconst special_request = keepNewOrPrevious(\n  base.special_request,\n  state.special_request\n);\n\nconst message = String(base.raw_message || base.message || '').toLowerCase();\n\nconst customer_confirmed =\n  /\\b(oui|ok|okay|c'est bon|c’est bon|c'est ça|c’est ça|exactement|je confirme|confirmé|confirme|validé|valide|parfait|go)\\b/i.test(message);\n\nconst customer_cancelled =\n  /\\b(non|annule|annuler|j'annule|j’annule|pas bon|ce n'est pas bon|ce n’est pas bon)\\b/i.test(message);\n\nconst hasRequired =\n  !!requested_datetime &&\n  !!party_size &&\n  !!full_name;\n\nconst is_closed =\n  closure.is_closed === true ||\n  closure.is_closed === 'true' ||\n  closure.is_closed === 1 ||\n  closure.is_closed === '1';\n\nconst is_available = !is_closed;\n\nconst timezone = base.timezone || 'Europe/Paris';\nconst humanDate = formatDateHumanFr(requested_datetime, timezone);\n\nlet reply = base.reply || 'Très bien, je vérifie votre demande.';\nlet should_create_reservation = false;\nlet availability_status = 'unknown';\nlet decision = base.decision || 'need_followup';\n\nif (customer_cancelled) {\n  decision = 'cancel';\n  availability_status = 'cancelled';\n  should_create_reservation = false;\n\n  reply =\n`Très bien, j’annule cette demande de réservation.\n\nJe reste disponible si vous souhaitez choisir un autre créneau.`;\n\n} else if (is_closed) {\n  decision = 'unavailable';\n  availability_status = 'closed';\n  should_create_reservation = false;\n\n  reply =\n`Désolé, le restaurant est fermé sur ce créneau${closure.closure_reason ? ` : ${closure.closure_reason}` : ''}.\n\nSouhaitez-vous choisir une autre date ou un autre horaire ?`;\n\n} else if (!hasRequired) {\n  decision = 'need_followup';\n  availability_status = 'missing_information';\n  should_create_reservation = false;\n\n  const missing = [];\n\n  if (!requested_datetime) missing.push('la date et l’heure');\n  if (!party_size) missing.push('le nombre de personnes');\n  if (!full_name) missing.push('le nom de la réservation');\n\n  if (requested_datetime && party_size && !full_name) {\n    reply =\n`Très bien, j’ai noté votre demande.\n\n📅 Date : ${humanDate}\n👥 Nombre de personnes : ${party_size}\n\nÀ quel nom dois-je mettre la réservation ?`;\n  } else if (requested_datetime && !party_size) {\n    reply =\n`Très bien, j’ai noté la date.\n\n📅 Date : ${humanDate}\n\nPour combien de personnes souhaitez-vous réserver ?`;\n  } else if (!requested_datetime && party_size) {\n    reply =\n`Très bien, j’ai noté pour ${party_size} personne${Number(party_size) > 1 ? 's' : ''}.\n\nPour quelle date et quelle heure souhaitez-vous réserver ?`;\n  } else {\n    reply =\n`Pouvez-vous me préciser ${missing.join(', ')} pour votre réservation ?`;\n  }\n\n} else if (hasRequired && !customer_confirmed) {\n  decision = 'ready_to_check_availability';\n  availability_status = 'waiting_confirmation';\n  should_create_reservation = false;\n\n  reply =\n`Je récapitule votre réservation :\n\n📅 Date : ${humanDate}\n👤 Nom : ${full_name}\n👥 Nombre de personnes : ${party_size}\n\nPouvez-vous confirmer ?`;\n\n} else if (hasRequired && customer_confirmed && is_available) {\n  decision = 'confirm';\n  availability_status = 'available';\n  should_create_reservation = true;\n\n  reply =\n`Parfait, je crée votre réservation.\n\n📅 Date : ${humanDate}\n👤 Nom : ${full_name}\n👥 Nombre de personnes : ${party_size}`;\n}\n\nreturn [\n  {\n    json: {\n      ...base,\n\n      requested_datetime,\n      party_size,\n      full_name,\n      phone,\n      email,\n      special_request,\n\n      is_closed,\n      is_available,\n      closure_reason: closure.closure_reason ?? null,\n\n      customer_confirmed,\n      customer_cancelled,\n      should_create_reservation,\n      availability_status,\n\n      decision,\n      reply,\n      last_agent_reply: reply,\n\n      human_requested_datetime: humanDate,\n      timezone\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4384,
+        128
+      ],
+      "id": "9c7b98d9-9878-4542-ad19-4115b9747c37",
+      "name": "Build Availability Decision"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.id}}",
+              "operation": "notEmpty"
+            }
+          ],
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          }
+        },
+        "options": {}
+      },
+      "id": "98c9c023-e063-43ad-bd46-bce4dfb72c86",
+      "name": "Client Found?1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        5856,
+        1040
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "1778c3ac-7660-4ed1-827f-a6c3ed13661f",
+              "leftValue": "={{ $json.should_create_reservation }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cc056a7c-686f-462a-ba4a-efff306b20a7",
+      "name": "Should Create Reservation?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        4880,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('Before Check Closure').item.json;\n\n// Si tu veux récupérer le résultat du IF ou des nœuds intermédiaires, adapte selon ton workflow\nlet client = {};\ntry {\n  client = $('Find Client').item.json || {};\n} catch (e) {}\n\nlet closure = {};\ntry {\n  closure = $('Check Closure').item.json || {};\n} catch (e) {}\n\nreturn [{\n  json: {\n    ...base,\n    telegram_chat_id: base.telegram_chat_id ?? null,\n    client_id: client.id ?? null,\n    is_closed: !!closure.id,\n    closure_id: closure.id ?? null,\n    closure_reason: closure.reason ?? null\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5856,
+        880
+      ],
+      "id": "8ff4d2f5-d42a-4ba6-b3c3-2c138f1c1ada",
+      "name": "Before Check Closure2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO clients (\n  restaurant_id,\n  full_name,\n  phone,\n  email,\n  is_new_customer,\n  consent_notifications,\n  consent_marketing,\n  created_at,\n  updated_at\n)\nVALUES (\n  {{ $('Build Availability Decision').item.json.restaurant_id }},\n  NULLIF('{{ $('Build Availability Decision').item.json.full_name || \"Client\" }}', ''),\n  NULLIF('{{ $('Build Availability Decision').item.json.phone || $('Build Availability Decision').item.json.phone_input || \"\" }}', ''),\n  NULLIF('{{ $('Build Availability Decision').item.json.email || \"\" }}', ''),\n  TRUE,\n  TRUE,\n  FALSE,\n  NOW(),\n  NOW()\n)\nRETURNING *;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5136,
+        112
+      ],
+      "id": "841af358-f055-4da2-9354-b9d12de0e9b5",
+      "name": "Upsert Client",
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO reservations (\n  restaurant_id,\n  client_id,\n  source_channel,\n  status,\n  party_size,\n  start_time,\n  end_time,\n  meal_duration_minutes,\n  special_request,\n  created_at,\n  updated_at\n)\nVALUES (\n  {{ $('Build Availability Decision').item.json.restaurant_id }},\n  {{ $json.id }},\n  '{{ $('Build Availability Decision').item.json.source || \"telegram\" }}',\n  'confirmed',\n  {{ $('Build Availability Decision').item.json.party_size }},\n  '{{ $('Build Availability Decision').item.json.requested_datetime }}'::timestamptz,\n  (\n    '{{ $('Build Availability Decision').item.json.requested_datetime }}'::timestamptz\n    + (\n      COALESCE({{ $('Build Availability Decision').item.json.default_meal_duration_minutes || 120 }}, 120)\n      || ' minutes'\n    )::interval\n  ),\n  COALESCE({{ $('Build Availability Decision').item.json.default_meal_duration_minutes || 120 }}, 120),\n  NULLIF('{{ $('Build Availability Decision').item.json.special_request || \"\" }}', ''),\n  NOW(),\n  NOW()\n)\nRETURNING *;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5312,
+        112
+      ],
+      "id": "bf54cef4-d503-407d-bad9-682b54adfc9f",
+      "name": "Create Reservation",
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO client_notifications (\n  restaurant_id,\n  client_id,\n  reservation_id,\n  notification_type,\n  channel,\n  content,\n  status,\n  scheduled_at,\n  created_at\n)\nVALUES (\n  {{ $('Build Availability Decision').item.json.restaurant_id }},\n  {{ $('Create Reservation').item.json.client_id }},\n  {{ $('Create Reservation').item.json.id }},\n  'reminder',\n  'telegram',\n  'Rappel de réservation',\n  'pending',\n  (\n    '{{ $('Create Reservation').item.json.start_time }}'::timestamptz\n    - INTERVAL '1 day'\n  ),\n  NOW()\n)\nRETURNING *;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5488,
+        112
+      ],
+      "id": "ce2a3953-bffc-4f8b-8d0d-a4368bce8379",
+      "name": "Create Reminder Notification",
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const reservation = $('Create Reservation').item.json;\nconst decision = $('Build Availability Decision').item.json;\n\nconst restaurantName = decision.restaurant_name || 'le restaurant';\nconst fullName = decision.full_name;\nconst partySize = decision.party_size;\n\nfunction formatDateHumanFr(iso, timezone = 'Europe/Paris') {\n  if (!iso) return null;\n\n  const d = new Date(iso);\n\n  const date = d.toLocaleDateString('fr-FR', {\n    weekday: 'long',\n    day: '2-digit',\n    month: 'long',\n    year: 'numeric',\n    timeZone: timezone\n  });\n\n  const time = d.toLocaleTimeString('fr-FR', {\n    hour: '2-digit',\n    minute: '2-digit',\n    timeZone: timezone\n  });\n\n  return `${date} à ${time}`;\n}\n\nconst dateFr = formatDateHumanFr(\n  reservation.start_time,\n  decision.timezone || 'Europe/Paris'\n);\n\nconst reply =\n`✅ Réservation confirmée !\n\n📅 Date : ${dateFr}\n👤 Nom : ${fullName}\n👥 Nombre de personnes : ${partySize}\n🍽️ Restaurant : ${restaurantName}\n\nMerci, à bientôt.`;\n\nreturn [\n  {\n    json: {\n      ...decision,\n      reservation_id: reservation.id,\n      client_id: reservation.client_id,\n      reservation_status: reservation.status,\n      reply,\n      last_agent_reply: reply\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5664,
+        112
+      ],
+      "id": "0e3e330f-e2fc-498e-b9ec-a99f70aff3d5",
+      "name": "Build Confirmation Reply"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO client_receivers (\n  restaurant_id,\n  channel_type,\n  channel_value,\n  display_name,\n  is_active,\n  first_seen_at,\n  last_seen_at,\n  created_at,\n  updated_at\n)\nVALUES (\n  {{ $json.restaurant_id }},\n  'telegram',\n  '{{ $json.telegram_chat_id || $json.from || $json.to }}',\n  NULLIF('{{ $json.full_name || \"\" }}', ''),\n  true,\n  NOW(),\n  NOW(),\n  NOW(),\n  NOW()\n)\nON CONFLICT (restaurant_id, channel_type, channel_value)\nDO UPDATE SET\n  display_name = COALESCE(NULLIF(EXCLUDED.display_name, ''), client_receivers.display_name),\n  is_active = true,\n  last_seen_at = NOW(),\n  updated_at = NOW()\nRETURNING *;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1280,
+        592
+      ],
+      "id": "bc2f8706-5864-4fa4-9b39-c15fe51c1964",
+      "name": "Upsert Client Receiver",
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS client_receivers (\n  id BIGSERIAL PRIMARY KEY,\n  restaurant_id BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,\n  client_id BIGINT REFERENCES clients(id) ON DELETE SET NULL,\n  channel_type TEXT NOT NULL,\n  channel_value TEXT NOT NULL,\n  display_name TEXT,\n  username TEXT,\n  is_active BOOLEAN NOT NULL DEFAULT true,\n  first_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n  UNIQUE (restaurant_id, channel_type, channel_value)\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1840,
+        224
+      ],
+      "id": "f92e0ae4-5f7b-4b67-a8fe-426ee7e75d87",
+      "name": "Ensure Client Receivers Table",
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO client_receivers (\n  restaurant_id,\n  channel_type,\n  channel_value,\n  display_name,\n  is_active,\n  first_seen_at,\n  last_seen_at,\n  created_at,\n  updated_at\n)\nVALUES (\n  {{ $json.restaurant_id }},\n  'telegram',\n  '{{ $json.telegram_chat_id || $json.from || $json.to }}',\n  NULLIF('{{ $json.full_name || \"\" }}', ''),\n  true,\n  NOW(),\n  NOW(),\n  NOW(),\n  NOW()\n)\nON CONFLICT (restaurant_id, channel_type, channel_value)\nDO UPDATE SET\n  display_name = COALESCE(NULLIF(EXCLUDED.display_name, ''), client_receivers.display_name),\n  is_active = true,\n  last_seen_at = NOW(),\n  updated_at = NOW()\nRETURNING *;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2560,
+        224
+      ],
+      "id": "1cfab09c-c83c-4f18-9b2f-524cd0c6d409",
+      "name": "Upsert Client Receiver1",
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3504,
+        -1200
+      ],
+      "typeVersion": 1,
+      "id": "64470025-86be-49e1-91d1-c594daef74ab",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Webhook Inbound": {
+      "main": [
+        [
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Input": {
+      "main": [
+        [
+          {
+            "node": "Has restaurant_slug?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has restaurant_slug?": {
+      "main": [
+        [
+          {
+            "node": "Lookup Restaurant by Slug",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Lookup Restaurant by Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Restaurant by Slug": {
+      "main": [
+        [
+          {
+            "node": "Normalize Restaurant Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Restaurant by Channel": {
+      "main": [
+        [
+          {
+            "node": "Normalize Restaurant Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Restaurant Context": {
+      "main": [
+        [
+          {
+            "node": "Upsert Client Receiver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restaurant Found?": {
+      "main": [
+        [
+          {
+            "node": "Ensure Conversation Sessions Table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Restaurant Not Found Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensure Conversation Sessions Table": {
+      "main": [
+        [
+          {
+            "node": "Ensure Client Receivers Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Conversation Session": {
+      "main": [
+        [
+          {
+            "node": "Merge Session Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Session Context": {
+      "main": [
+        [
+          {
+            "node": "Upsert Client Receiver1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent Conversationnel Restau",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent Conversationnel Restau",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Agent Conversationnel Restau",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Agent Output": {
+      "main": [
+        [
+          {
+            "node": "Normalize Datetime",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Datetime": {
+      "main": [
+        [
+          {
+            "node": "Prepare Has Datetime",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has requested_datetime?": {
+      "main": [
+        [
+          {
+            "node": "Before Check Closure",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Follow-up Without Datetime",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Closure": {
+      "main": [
+        [
+          {
+            "node": "Build Availability Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Follow-up Without Datetime": {
+      "main": [
+        [
+          {
+            "node": "Build Conversation State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Client": {
+      "main": [
+        [
+          {
+            "node": "Should Create Reservation?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client": {
+      "main": [
+        [
+          {
+            "node": "Build Conversation State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Conversation Session": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Session Lookup": {
+      "main": [
+        [
+          {
+            "node": "Load Conversation Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Has Datetime": {
+      "main": [
+        [
+          {
+            "node": "Has requested_datetime?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Before Check Closure": {
+      "main": [
+        [
+          {
+            "node": "Check Closure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Inbound": {
+      "main": [
+        [
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent Conversationnel Restau": {
+      "main": [
+        [
+          {
+            "node": "Normalize Agent Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Restaurant Not Found Reply": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Conversation State": {
+      "main": [
+        [
+          {
+            "node": "Upsert Conversation Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Final Reservation Reply": {
+      "main": [
+        [
+          {
+            "node": "Find Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Availability Decision": {
+      "main": [
+        [
+          {
+            "node": "Build Final Reservation Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Create Reservation?": {
+      "main": [
+        [
+          {
+            "node": "Upsert Client",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Client": {
+      "main": [
+        [
+          {
+            "node": "Create Reservation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Reservation": {
+      "main": [
+        [
+          {
+            "node": "Create Reminder Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Reminder Notification": {
+      "main": [
+        [
+          {
+            "node": "Build Confirmation Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Confirmation Reply": {
+      "main": [
+        [
+          {
+            "node": "Build Conversation State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Client Receiver": {
+      "main": [
+        [
+          {
+            "node": "Restaurant Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensure Client Receivers Table": {
+      "main": [
+        [
+          {
+            "node": "Prepare Session Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Client Receiver1": {
+      "main": [
+        [
+          {
+            "node": "Agent Conversationnel Restau",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "437b27e0-df95-4c94-8095-544aa1f3c725",
+  "activeVersionId": "437b27e0-df95-4c94-8095-544aa1f3c725",
+  "versionCounter": 489,
+  "triggerCount": 2,
+  "sourceWorkflowId": null,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T17:50:56.849Z",
+      "createdAt": "2026-07-18T17:50:56.849Z",
+      "role": "workflow:owner",
+      "workflowId": "UgthKUfZdXW385HG",
+      "projectId": "qCyrAhwkn3YBEnnC",
+      "project": {
+        "updatedAt": "2026-07-18T16:53:40.765Z",
+        "createdAt": "2026-06-26T07:15:48.107Z",
+        "id": "qCyrAhwkn3YBEnnC",
+        "name": "Jérémy Lemaire <lemaire.jerem@orange.fr>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "customTelemetryTags": [],
+        "creatorId": "1c348afe-df46-47f4-b6d4-933ef081ab0d"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": "Version 437b27e0",
+    "description": ""
+  }
+}

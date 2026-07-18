@@ -1,0 +1,17 @@
+{
+  "exported_at": "20260718_221350",
+  "tenant_dir": "/opt/clients/little_africa_nice",
+  "client_id": "little_africa_nice",
+  "base_domain": "cyber-saas-private.ddnsfree.com",
+  "n8n_host": "cyber-saas-private.ddnsfree.com",
+  "n8n_path": "/little_africa_nice/",
+  "webhook_url": "https://cyber-saas-private.ddnsfree.com/little_africa_nice/",
+  "n8n_editor_base_url": "https://cyber-saas-private.ddnsfree.com/little_africa_nice/",
+  "postgres_db": "booking_shared_little_africa",
+  "postgres_user": "booking_little_africa",
+  "containers": {
+    "n8n": "little_africa_nice_n8n",
+    "postgres": "little_africa_nice_postgres"
+  },
+  "recommended_webhook": "https://cyber-saas-private.ddnsfree.com/little_africa_nice/webhook/retell-voice-function"
+}

@@ -1,0 +1,11 @@
+
+Route tenant CLIENT_ID
+
+handle /CLIENT_ID/webhook/* {
+uri strip_prefix /CLIENT_ID
+reverse_proxy __CLIENT_ID___n8n:5678
+}
+
+handle_path /CLIENT_ID/* {
+reverse_proxy __CLIENT_ID___n8n:5678
+}

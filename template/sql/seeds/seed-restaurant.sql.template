@@ -1,0 +1,69 @@
+BEGIN;
+
+INSERT INTO restaurants (
+slug,
+name,
+timezone,
+is_active,
+created_at,
+updated_at
+)
+VALUES (
+'RESTAURANT_SLUG',
+'RESTAURANT_NAME',
+'Europe/Paris',
+true,
+NOW(),
+NOW()
+)
+ON CONFLICT (slug)
+DO UPDATE SET
+name = EXCLUDED.name,
+timezone = EXCLUDED.timezone,
+is_active = true,
+updated_at = NOW();
+
+INSERT INTO restaurant_settings (
+restaurant_id,
+default_meal_duration_minutes,
+cleaning_buffer_minutes,
+grace_delay_minutes,
+max_party_size,
+allow_combined_tables,
+reminder_days_before,
+reminder_hour,
+reminder_channel,
+booking_policy,
+event_notification_policy,
+created_at,
+updated_at
+)
+SELECT
+r.id,
+120,
+15,
+10,
+12,
+false,
+1,
+9,
+'sms',
+NULL,
+NULL,
+NOW(),
+NOW()
+FROM restaurants r
+WHERE r.slug = 'RESTAURANT_SLUG'
+ON CONFLICT (restaurant_id)
+DO UPDATE SET
+default_meal_duration_minutes = EXCLUDED.default_meal_duration_minutes,
+cleaning_buffer_minutes = EXCLUDED.cleaning_buffer_minutes,
+grace_delay_minutes = EXCLUDED.grace_delay_minutes,
+max_party_size = EXCLUDED.max_party_size,
+allow_combined_tables = EXCLUDED.allow_combined_tables,
+reminder_days_before = EXCLUDED.reminder_days_before,
+reminder_hour = EXCLUDED.reminder_hour,
+reminder_channel = EXCLUDED.reminder_channel,
+updated_at = NOW();
+
+COMMIT;

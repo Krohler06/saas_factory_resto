@@ -1,0 +1,68 @@
+services:
+postgres:
+image: postgres:16
+container_name: ${CLIENT_ID}_postgres
+environment:
+POSTGRES_DB: ${POSTGRES_DB}
+POSTGRES_USER: ${POSTGRES_USER}
+POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+TZ: Europe/Paris
+PGTZ: Europe/Paris
+volumes:
+- pgdata:/var/lib/postgresql/data
+- ./sql:/sql:ro
+restart: unless-stopped
+healthcheck:
+test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+interval: 10s
+timeout: 5s
+retries: 20
+networks:
+- tenant_net
+
+n8n:
+image: n8nio/n8n:latest
+container_name: ${CLIENT_ID}_n8n
+depends_on:
+postgres:
+condition: service_healthy
+environment:
+TZ: Europe/Paris
+GENERIC_TIMEZONE: Europe/Paris
+
+  DB_TYPE: postgresdb
+  DB_POSTGRESDB_HOST: postgres
+  DB_POSTGRESDB_PORT: 5432
+  DB_POSTGRESDB_DATABASE: ${POSTGRES_DB}
+  DB_POSTGRESDB_USER: ${POSTGRES_USER}
+  DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+
+  N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+  N8N_USER_MANAGEMENT_JWT_SECRET: ${N8N_USER_MANAGEMENT_JWT_SECRET}
+
+  N8N_HOST: ${N8N_HOST}
+  N8N_PROTOCOL: ${N8N_PROTOCOL}
+  N8N_PATH: ${N8N_PATH}
+  WEBHOOK_URL: ${WEBHOOK_URL}
+  N8N_EDITOR_BASE_URL: ${N8N_EDITOR_BASE_URL}
+
+  N8N_SECURE_COOKIE: "true"
+  N8N_DIAGNOSTICS_ENABLED: "false"
+  N8N_PERSONALIZATION_ENABLED: "false"
+  N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
+
+volumes:
+  - ./data/n8n:/home/node/.n8n
+  - ./workflows:/workflows
+  - ./sql:/sql:ro
+restart: unless-stopped
+networks:
+  - tenant_net
+
+networks:
+tenant_net:
+name: ${CLIENT_ID}_net
+
+volumes:
+pgdata:
+name: ${CLIENT_ID}_pgdata

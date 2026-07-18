@@ -1,0 +1,38 @@
+# Exports bruts
+exports/
+*.tgz
+*.tar.gz
+*.zip
+
+# Secrets / environnements
+.env
+.env.*
+!.env.template
+**/.env
+**/.env.*
+!**/.env.template
+**/*DO_NOT_COMMIT*
+**/*private*
+**/*secret*
+**/*decrypted*
+**/credentials.encrypted.json
+**/credentials.decrypted*.json
+
+# Données runtime Docker / n8n
+**/data/
+**/pgdata/
+**/logs/
+**/*.log
+**/tmp/
+**/.n8n/
+
+# Backups
+*.bak
+*.backup
+*.old
+
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

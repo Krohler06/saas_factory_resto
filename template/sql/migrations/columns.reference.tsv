@@ -1,0 +1,917 @@
+agent_checkpoints	runId	character varying	NO	
+agent_checkpoints	agentId	character varying	YES	
+agent_checkpoints	state	text	YES	
+agent_checkpoints	expired	boolean	NO	false
+agent_checkpoints	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_checkpoints	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_execution	id	character varying	NO	
+agent_execution	threadId	character varying	NO	
+agent_execution	status	character varying	NO	
+agent_execution	startedAt	timestamp with time zone	YES	
+agent_execution	stoppedAt	timestamp with time zone	YES	
+agent_execution	duration	integer	NO	0
+agent_execution	userMessage	text	NO	
+agent_execution	assistantResponse	text	NO	
+agent_execution	model	character varying	YES	
+agent_execution	promptTokens	integer	YES	
+agent_execution	completionTokens	integer	YES	
+agent_execution	totalTokens	integer	YES	
+agent_execution	cost	double precision	YES	
+agent_execution	toolCalls	json	YES	
+agent_execution	timeline	json	YES	
+agent_execution	error	text	YES	
+agent_execution	hitlStatus	character varying	YES	
+agent_execution	source	character varying	YES	
+agent_execution	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_execution	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_execution_threads	id	character varying	NO	
+agent_execution_threads	agentId	character varying	NO	
+agent_execution_threads	agentName	character varying	NO	
+agent_execution_threads	projectId	character varying	NO	
+agent_execution_threads	sessionNumber	integer	NO	0
+agent_execution_threads	totalPromptTokens	integer	NO	0
+agent_execution_threads	totalCompletionTokens	integer	NO	0
+agent_execution_threads	totalCost	double precision	NO	0
+agent_execution_threads	totalDuration	integer	NO	0
+agent_execution_threads	title	character varying	YES	
+agent_execution_threads	emoji	character varying	YES	
+agent_execution_threads	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_execution_threads	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_execution_threads	taskId	character varying	YES	
+agent_execution_threads	taskVersionId	character varying	YES	
+agent_files	id	character varying	NO	
+agent_files	agentId	character varying	NO	
+agent_files	binaryDataId	text	NO	
+agent_files	fileName	character varying	NO	
+agent_files	mimeType	character varying	NO	
+agent_files	fileSizeBytes	integer	NO	
+agent_files	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_files	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_history	versionId	character varying	NO	
+agent_history	agentId	character varying	NO	
+agent_history	schema	json	YES	
+agent_history	tools	json	YES	
+agent_history	skills	json	YES	
+agent_history	publishedById	uuid	YES	
+agent_history	author	character varying	NO	
+agent_history	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_history	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_task_definition	id	character varying	NO	
+agent_task_definition	agentId	character varying	NO	
+agent_task_definition	name	character varying	NO	
+agent_task_definition	objective	text	NO	
+agent_task_definition	cronExpression	character varying	NO	
+agent_task_definition	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_task_definition	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_task_run_lock	agentId	character varying	NO	
+agent_task_run_lock	taskId	character varying	NO	
+agent_task_run_lock	holderId	uuid	NO	
+agent_task_run_lock	heldUntil	timestamp with time zone	NO	
+agent_task_run_lock	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_task_run_lock	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_task_snapshot	versionId	character varying	NO	
+agent_task_snapshot	taskId	character varying	NO	
+agent_task_snapshot	enabled	boolean	NO	
+agent_task_snapshot	name	character varying	NO	
+agent_task_snapshot	objective	text	NO	
+agent_task_snapshot	cronExpression	character varying	NO	
+agent_task_snapshot	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agent_task_snapshot	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents	id	character varying	NO	
+agents	name	character varying	NO	
+agents	description	character varying	YES	
+agents	projectId	character varying	NO	
+agents	integrations	json	NO	'[]'::json
+agents	schema	json	YES	
+agents	tools	json	NO	'{}'::json
+agents	skills	json	NO	'{}'::json
+agents	versionId	character varying	YES	
+agents	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents	activeVersionId	character varying	YES	
+agents_memory_entries	id	character varying	NO	
+agents_memory_entries	agentId	character varying	NO	
+agents_memory_entries	resourceId	character varying	NO	
+agents_memory_entries	content	text	NO	
+agents_memory_entries	contentHash	character varying	NO	
+agents_memory_entries	status	character varying	NO	
+agents_memory_entries	supersededBy	character varying	YES	
+agents_memory_entries	embeddingModel	character varying	YES	
+agents_memory_entries	embedding	json	YES	
+agents_memory_entries	metadata	json	YES	
+agents_memory_entries	lastSeenAt	timestamp with time zone	NO	
+agents_memory_entries	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_memory_entries	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_memory_entry_cursors	agentId	character varying	NO	
+agents_memory_entry_cursors	observationScopeId	character varying	NO	
+agents_memory_entry_cursors	lastIndexedObservationId	character varying	NO	
+agents_memory_entry_cursors	lastIndexedObservationCreatedAt	timestamp with time zone	NO	
+agents_memory_entry_cursors	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_memory_entry_cursors	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_memory_entry_locks	agentId	character varying	NO	
+agents_memory_entry_locks	resourceId	character varying	NO	
+agents_memory_entry_locks	holderId	character varying	NO	
+agents_memory_entry_locks	heldUntil	timestamp with time zone	NO	
+agents_memory_entry_locks	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_memory_entry_locks	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_memory_entry_sources	id	character varying	NO	
+agents_memory_entry_sources	agentId	character varying	NO	
+agents_memory_entry_sources	memoryEntryId	character varying	NO	
+agents_memory_entry_sources	observationId	character varying	NO	
+agents_memory_entry_sources	threadId	character varying	NO	
+agents_memory_entry_sources	evidenceHash	character varying	NO	
+agents_memory_entry_sources	evidenceText	text	NO	
+agents_memory_entry_sources	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_memory_entry_sources	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_messages	id	character varying	NO	
+agents_messages	threadId	character varying	NO	
+agents_messages	resourceId	character varying	NO	
+agents_messages	role	character varying	NO	
+agents_messages	type	character varying	YES	
+agents_messages	content	json	NO	
+agents_messages	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_messages	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_observation_cursors	agentId	character varying	NO	
+agents_observation_cursors	observationScopeId	character varying	NO	
+agents_observation_cursors	lastObservedMessageId	character varying	NO	
+agents_observation_cursors	lastObservedAt	timestamp with time zone	NO	
+agents_observation_cursors	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_observation_cursors	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_observation_locks	agentId	character varying	NO	
+agents_observation_locks	observationScopeId	character varying	NO	
+agents_observation_locks	taskKind	character varying	NO	
+agents_observation_locks	holderId	character varying	NO	
+agents_observation_locks	heldUntil	timestamp with time zone	NO	
+agents_observation_locks	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_observation_locks	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_observations	id	character varying	NO	
+agents_observations	agentId	character varying	NO	
+agents_observations	observationScopeId	character varying	NO	
+agents_observations	marker	character varying	NO	
+agents_observations	text	text	NO	
+agents_observations	parentId	character varying	YES	
+agents_observations	tokenCount	integer	NO	0
+agents_observations	status	character varying	NO	
+agents_observations	supersededBy	character varying	YES	
+agents_observations	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_observations	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_resources	id	character varying	NO	
+agents_resources	metadata	text	YES	
+agents_resources	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_resources	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_threads	id	character varying	NO	
+agents_threads	resourceId	character varying	NO	
+agents_threads	title	character varying	YES	
+agents_threads	metadata	text	YES	
+agents_threads	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+agents_threads	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+ai_builder_temporary_workflow	workflowId	character varying	NO	
+ai_builder_temporary_workflow	threadId	uuid	NO	
+ai_builder_temporary_workflow	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+ai_builder_temporary_workflow	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+annotation_tag_entity	id	character varying	NO	
+annotation_tag_entity	name	character varying	NO	
+annotation_tag_entity	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+annotation_tag_entity	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+auth_identity	userId	uuid	YES	
+auth_identity	providerId	character varying	NO	
+auth_identity	providerType	character varying	NO	
+auth_identity	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+auth_identity	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+auth_provider_sync_history	id	integer	NO	nextval('auth_provider_sync_history_id_seq'::regclass)
+auth_provider_sync_history	providerType	character varying	NO	
+auth_provider_sync_history	runMode	text	NO	
+auth_provider_sync_history	status	text	NO	
+auth_provider_sync_history	startedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP
+auth_provider_sync_history	endedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP
+auth_provider_sync_history	scanned	integer	NO	
+auth_provider_sync_history	created	integer	NO	
+auth_provider_sync_history	updated	integer	NO	
+auth_provider_sync_history	disabled	integer	NO	
+auth_provider_sync_history	error	text	YES	
+binary_data	fileId	uuid	NO	
+binary_data	sourceType	character varying	NO	
+binary_data	sourceId	character varying	NO	
+binary_data	data	bytea	NO	
+binary_data	mimeType	character varying	YES	
+binary_data	fileName	character varying	YES	
+binary_data	fileSize	integer	NO	
+binary_data	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+binary_data	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+channel_conversation_logs	id	bigint	NO	nextval('channel_conversation_logs_id_seq'::regclass)
+channel_conversation_logs	restaurant_id	bigint	YES	
+channel_conversation_logs	conversation_id	text	NO	
+channel_conversation_logs	external_event_id	text	NO	
+channel_conversation_logs	call_id	text	YES	
+channel_conversation_logs	sms_id	text	YES	
+channel_conversation_logs	email_message_id	text	YES	
+channel_conversation_logs	instagram_message_id	text	YES	
+channel_conversation_logs	source	text	NO	
+channel_conversation_logs	channel	text	NO	
+channel_conversation_logs	provider	text	YES	
+channel_conversation_logs	phone	text	YES	
+channel_conversation_logs	email	text	YES	
+channel_conversation_logs	summary	text	YES	
+channel_conversation_logs	transcript	text	YES	
+channel_conversation_logs	user_message	text	YES	
+channel_conversation_logs	raw_payload	jsonb	YES	
+channel_conversation_logs	created_at	timestamp with time zone	NO	now()
+chat_hub_agent_tools	agentId	uuid	NO	
+chat_hub_agent_tools	toolId	uuid	NO	
+chat_hub_agents	id	uuid	NO	
+chat_hub_agents	name	character varying	NO	
+chat_hub_agents	description	character varying	YES	
+chat_hub_agents	systemPrompt	text	NO	
+chat_hub_agents	ownerId	uuid	NO	
+chat_hub_agents	credentialId	character varying	YES	
+chat_hub_agents	provider	character varying	NO	
+chat_hub_agents	model	character varying	NO	
+chat_hub_agents	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+chat_hub_agents	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+chat_hub_agents	icon	json	YES	
+chat_hub_agents	files	json	NO	'[]'::json
+chat_hub_agents	suggestedPrompts	json	NO	'[]'::json
+chat_hub_messages	id	uuid	NO	
+chat_hub_messages	sessionId	uuid	NO	
+chat_hub_messages	previousMessageId	uuid	YES	
+chat_hub_messages	revisionOfMessageId	uuid	YES	
+chat_hub_messages	retryOfMessageId	uuid	YES	
+chat_hub_messages	type	character varying	NO	
+chat_hub_messages	name	character varying	NO	
+chat_hub_messages	content	text	NO	
+chat_hub_messages	provider	character varying	YES	
+chat_hub_messages	model	character varying	YES	
+chat_hub_messages	workflowId	character varying	YES	
+chat_hub_messages	executionId	integer	YES	
+chat_hub_messages	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+chat_hub_messages	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+chat_hub_messages	agentId	uuid	YES	
+chat_hub_messages	status	character varying	NO	'success'::character varying
+chat_hub_messages	attachments	json	YES	
+chat_hub_session_tools	sessionId	uuid	NO	
+chat_hub_session_tools	toolId	uuid	NO	
+chat_hub_sessions	id	uuid	NO	
+chat_hub_sessions	title	character varying	NO	
+chat_hub_sessions	ownerId	uuid	NO	
+chat_hub_sessions	lastMessageAt	timestamp with time zone	NO	
+chat_hub_sessions	credentialId	character varying	YES	
+chat_hub_sessions	provider	character varying	YES	
+chat_hub_sessions	model	character varying	YES	
+chat_hub_sessions	workflowId	character varying	YES	
+chat_hub_sessions	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+chat_hub_sessions	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+chat_hub_sessions	agentId	uuid	YES	
+chat_hub_sessions	agentName	character varying	YES	
+chat_hub_sessions	type	character varying	NO	'production'::character varying
+chat_hub_tools	id	uuid	NO	
+chat_hub_tools	name	character varying	NO	
+chat_hub_tools	type	character varying	NO	
+chat_hub_tools	typeVersion	double precision	NO	
+chat_hub_tools	ownerId	uuid	NO	
+chat_hub_tools	definition	json	NO	
+chat_hub_tools	enabled	boolean	NO	true
+chat_hub_tools	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+chat_hub_tools	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+client_notifications	id	bigint	NO	nextval('client_notifications_id_seq'::regclass)
+client_notifications	restaurant_id	bigint	NO	
+client_notifications	reservation_id	bigint	YES	
+client_notifications	client_id	bigint	YES	
+client_notifications	channel	text	NO	'whatsapp'::text
+client_notifications	scheduled_at	timestamp with time zone	NO	
+client_notifications	sent_at	timestamp with time zone	YES	
+client_notifications	status	text	NO	'pending'::text
+client_notifications	payload	jsonb	YES	
+client_notifications	created_at	timestamp with time zone	NO	now()
+client_notifications	updated_at	timestamp with time zone	NO	now()
+clients	id	bigint	NO	nextval('clients_id_seq'::regclass)
+clients	restaurant_id	bigint	NO	
+clients	full_name	text	YES	
+clients	phone	text	YES	
+clients	email	text	YES	
+clients	channel_type	text	YES	
+clients	channel_value	text	YES	
+clients	created_at	timestamp with time zone	NO	now()
+clients	updated_at	timestamp with time zone	NO	now()
+clients	is_new_customer	boolean	NO	true
+clients	notes	text	YES	
+clients	preferences	jsonb	YES	
+clients	consent_notifications	boolean	NO	true
+clients	consent_marketing	boolean	NO	false
+conversation_states	id	bigint	NO	nextval('conversation_states_id_seq'::regclass)
+conversation_states	restaurant_id	bigint	YES	
+conversation_states	conversation_id	text	NO	
+conversation_states	channel_type	text	NO	
+conversation_states	channel_value	text	YES	
+conversation_states	state	jsonb	NO	'{}'::jsonb
+conversation_states	last_message_at	timestamp with time zone	YES	
+conversation_states	created_at	timestamp with time zone	NO	now()
+conversation_states	updated_at	timestamp with time zone	NO	now()
+credential_dependency	id	integer	NO	
+credential_dependency	credentialId	character varying	NO	
+credential_dependency	dependencyType	character varying	NO	
+credential_dependency	dependencyId	character varying	NO	
+credential_dependency	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+credentials_entity	name	character varying	NO	
+credentials_entity	data	text	NO	
+credentials_entity	type	character varying	NO	
+credentials_entity	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+credentials_entity	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+credentials_entity	id	character varying	NO	
+credentials_entity	isManaged	boolean	NO	false
+credentials_entity	isGlobal	boolean	NO	false
+credentials_entity	isResolvable	boolean	NO	false
+credentials_entity	resolvableAllowFallback	boolean	NO	false
+credentials_entity	resolverId	character varying	YES	
+data_table	id	character varying	NO	
+data_table	name	character varying	NO	
+data_table	projectId	character varying	NO	
+data_table	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+data_table	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+data_table_column	id	character varying	NO	
+data_table_column	name	character varying	NO	
+data_table_column	type	character varying	NO	
+data_table_column	index	integer	NO	
+data_table_column	dataTableId	character varying	NO	
+data_table_column	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+data_table_column	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+deployment_key	id	character varying	NO	
+deployment_key	type	character varying	NO	
+deployment_key	value	text	NO	
+deployment_key	algorithm	character varying	YES	
+deployment_key	status	character varying	NO	
+deployment_key	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+deployment_key	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+dynamic_credential_entry	credential_id	character varying	NO	
+dynamic_credential_entry	subject_id	character varying	NO	
+dynamic_credential_entry	resolver_id	character varying	NO	
+dynamic_credential_entry	data	text	NO	
+dynamic_credential_entry	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+dynamic_credential_entry	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+dynamic_credential_resolver	id	character varying	NO	
+dynamic_credential_resolver	name	character varying	NO	
+dynamic_credential_resolver	type	character varying	NO	
+dynamic_credential_resolver	config	text	NO	
+dynamic_credential_resolver	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+dynamic_credential_resolver	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+dynamic_credential_user_entry	credentialId	character varying	NO	
+dynamic_credential_user_entry	userId	uuid	NO	
+dynamic_credential_user_entry	resolverId	character varying	NO	
+dynamic_credential_user_entry	data	text	NO	
+dynamic_credential_user_entry	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+dynamic_credential_user_entry	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+evaluation_collection	id	character varying	NO	
+evaluation_collection	name	character varying	NO	
+evaluation_collection	description	text	YES	
+evaluation_collection	workflowId	character varying	NO	
+evaluation_collection	evaluationConfigId	character varying	NO	
+evaluation_collection	createdById	uuid	YES	
+evaluation_collection	insightsCache	json	YES	
+evaluation_collection	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+evaluation_collection	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+evaluation_config	id	character varying	NO	
+evaluation_config	workflowId	character varying	NO	
+evaluation_config	name	character varying	NO	
+evaluation_config	status	character varying	NO	'valid'::character varying
+evaluation_config	invalidReason	character varying	YES	
+evaluation_config	datasetSource	character varying	NO	
+evaluation_config	datasetRef	json	NO	
+evaluation_config	startNodeName	character varying	NO	
+evaluation_config	endNodeName	character varying	NO	
+evaluation_config	metrics	json	NO	
+evaluation_config	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+evaluation_config	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+event_destinations	id	uuid	NO	
+event_destinations	destination	jsonb	NO	
+event_destinations	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+event_destinations	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+execution_annotation_tags	annotationId	integer	NO	
+execution_annotation_tags	tagId	character varying	NO	
+execution_annotations	id	integer	NO	nextval('execution_annotations_id_seq'::regclass)
+execution_annotations	executionId	integer	NO	
+execution_annotations	vote	character varying	YES	
+execution_annotations	note	text	YES	
+execution_annotations	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+execution_annotations	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+execution_data	executionId	integer	NO	
+execution_data	workflowData	json	NO	
+execution_data	data	text	NO	
+execution_data	workflowVersionId	character varying	YES	
+execution_entity	id	integer	NO	nextval('execution_entity_id_seq'::regclass)
+execution_entity	finished	boolean	NO	
+execution_entity	mode	character varying	NO	
+execution_entity	retryOf	character varying	YES	
+execution_entity	retrySuccessId	character varying	YES	
+execution_entity	startedAt	timestamp with time zone	YES	
+execution_entity	stoppedAt	timestamp with time zone	YES	
+execution_entity	waitTill	timestamp with time zone	YES	
+execution_entity	status	character varying	NO	
+execution_entity	workflowId	character varying	NO	
+execution_entity	deletedAt	timestamp with time zone	YES	
+execution_entity	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+execution_entity	storedAt	character varying	NO	'db'::character varying
+execution_entity	tracingContext	json	YES	
+execution_entity	deduplicationKey	character varying	YES	
+execution_metadata	id	integer	NO	nextval('execution_metadata_temp_id_seq'::regclass)
+execution_metadata	executionId	integer	NO	
+execution_metadata	key	character varying	NO	
+execution_metadata	value	text	NO	
+folder	id	character varying	NO	
+folder	name	character varying	NO	
+folder	parentFolderId	character varying	YES	
+folder	projectId	character varying	NO	
+folder	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+folder	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+folder_tag	folderId	character varying	NO	
+folder_tag	tagId	character varying	NO	
+insights_by_period	id	integer	NO	
+insights_by_period	metaId	integer	NO	
+insights_by_period	type	integer	NO	
+insights_by_period	value	bigint	NO	
+insights_by_period	periodUnit	integer	NO	
+insights_by_period	periodStart	timestamp with time zone	YES	CURRENT_TIMESTAMP
+insights_metadata	metaId	integer	NO	
+insights_metadata	workflowId	character varying	YES	
+insights_metadata	projectId	character varying	YES	
+insights_metadata	workflowName	character varying	NO	
+insights_metadata	projectName	character varying	NO	
+insights_raw	id	integer	NO	
+insights_raw	metaId	integer	NO	
+insights_raw	type	integer	NO	
+insights_raw	value	bigint	NO	
+insights_raw	timestamp	timestamp with time zone	NO	CURRENT_TIMESTAMP
+installed_nodes	name	character varying	NO	
+installed_nodes	type	character varying	NO	
+installed_nodes	latestVersion	integer	NO	1
+installed_nodes	package	character varying	NO	
+installed_packages	packageName	character varying	NO	
+installed_packages	installedVersion	character varying	NO	
+installed_packages	authorName	character varying	YES	
+installed_packages	authorEmail	character varying	YES	
+installed_packages	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+installed_packages	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_checkpoints	key	character varying	NO	
+instance_ai_checkpoints	runId	character varying	YES	
+instance_ai_checkpoints	threadId	uuid	NO	
+instance_ai_checkpoints	resourceId	character varying	YES	
+instance_ai_checkpoints	state	json	YES	
+instance_ai_checkpoints	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_checkpoints	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_checkpoints	expiredAt	timestamp with time zone	YES	
+instance_ai_iteration_logs	id	character varying	NO	
+instance_ai_iteration_logs	threadId	uuid	NO	
+instance_ai_iteration_logs	taskKey	character varying	NO	
+instance_ai_iteration_logs	entry	text	NO	
+instance_ai_iteration_logs	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_iteration_logs	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_messages	id	character varying	NO	
+instance_ai_messages	threadId	uuid	NO	
+instance_ai_messages	content	text	NO	
+instance_ai_messages	role	character varying	NO	
+instance_ai_messages	type	character varying	YES	
+instance_ai_messages	resourceId	character varying	YES	
+instance_ai_messages	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_messages	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_observation_cursors	observationScopeId	uuid	NO	
+instance_ai_observation_cursors	lastObservedMessageId	character varying	NO	
+instance_ai_observation_cursors	lastObservedAt	timestamp with time zone	NO	
+instance_ai_observation_cursors	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_observation_cursors	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_observation_locks	observationScopeId	uuid	NO	
+instance_ai_observation_locks	taskKind	character varying	NO	
+instance_ai_observation_locks	holderId	character varying	NO	
+instance_ai_observation_locks	heldUntil	timestamp with time zone	NO	
+instance_ai_observation_locks	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_observation_locks	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_observational_memory	id	character varying	NO	
+instance_ai_observational_memory	lookupKey	character varying	NO	
+instance_ai_observational_memory	scope	character varying	NO	
+instance_ai_observational_memory	threadId	uuid	YES	
+instance_ai_observational_memory	resourceId	character varying	NO	
+instance_ai_observational_memory	activeObservations	text	NO	''::text
+instance_ai_observational_memory	originType	character varying	NO	
+instance_ai_observational_memory	config	text	NO	
+instance_ai_observational_memory	generationCount	integer	NO	0
+instance_ai_observational_memory	lastObservedAt	timestamp with time zone	YES	
+instance_ai_observational_memory	pendingMessageTokens	integer	NO	0
+instance_ai_observational_memory	totalTokensObserved	integer	NO	0
+instance_ai_observational_memory	observationTokenCount	integer	NO	0
+instance_ai_observational_memory	isObserving	boolean	NO	false
+instance_ai_observational_memory	isReflecting	boolean	NO	false
+instance_ai_observational_memory	observedMessageIds	json	YES	
+instance_ai_observational_memory	observedTimezone	character varying	YES	
+instance_ai_observational_memory	bufferedObservations	text	YES	
+instance_ai_observational_memory	bufferedObservationTokens	integer	YES	
+instance_ai_observational_memory	bufferedMessageIds	json	YES	
+instance_ai_observational_memory	bufferedReflection	text	YES	
+instance_ai_observational_memory	bufferedReflectionTokens	integer	YES	
+instance_ai_observational_memory	bufferedReflectionInputTokens	integer	YES	
+instance_ai_observational_memory	reflectedObservationLineCount	integer	YES	
+instance_ai_observational_memory	bufferedObservationChunks	json	YES	
+instance_ai_observational_memory	isBufferingObservation	boolean	NO	false
+instance_ai_observational_memory	isBufferingReflection	boolean	NO	false
+instance_ai_observational_memory	lastBufferedAtTokens	integer	NO	0
+instance_ai_observational_memory	lastBufferedAtTime	timestamp with time zone	YES	
+instance_ai_observational_memory	metadata	json	YES	
+instance_ai_observational_memory	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_observational_memory	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_observations	id	character varying	NO	
+instance_ai_observations	observationScopeId	uuid	NO	
+instance_ai_observations	marker	character varying	NO	
+instance_ai_observations	text	text	NO	
+instance_ai_observations	parentId	character varying	YES	
+instance_ai_observations	tokenCount	integer	NO	0
+instance_ai_observations	status	character varying	NO	
+instance_ai_observations	supersededBy	character varying	YES	
+instance_ai_observations	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_observations	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_pending_confirmations	requestId	character varying	NO	
+instance_ai_pending_confirmations	threadId	uuid	NO	
+instance_ai_pending_confirmations	userId	uuid	NO	
+instance_ai_pending_confirmations	kind	character varying	NO	
+instance_ai_pending_confirmations	runId	character varying	NO	
+instance_ai_pending_confirmations	toolCallId	character varying	YES	
+instance_ai_pending_confirmations	messageGroupId	character varying	YES	
+instance_ai_pending_confirmations	checkpointKey	character varying	YES	
+instance_ai_pending_confirmations	checkpointTaskId	character varying	YES	
+instance_ai_pending_confirmations	expiresAt	timestamp with time zone	YES	
+instance_ai_pending_confirmations	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_pending_confirmations	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_resources	id	character varying	NO	
+instance_ai_resources	workingMemory	text	YES	
+instance_ai_resources	metadata	json	YES	
+instance_ai_resources	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_resources	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_run_snapshots	threadId	uuid	NO	
+instance_ai_run_snapshots	runId	character varying	NO	
+instance_ai_run_snapshots	messageGroupId	character varying	YES	
+instance_ai_run_snapshots	runIds	json	YES	
+instance_ai_run_snapshots	tree	text	NO	
+instance_ai_run_snapshots	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_run_snapshots	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_run_snapshots	langsmithRunId	character varying	YES	
+instance_ai_run_snapshots	langsmithTraceId	character varying	YES	
+instance_ai_run_snapshots	traceId	character varying	YES	
+instance_ai_run_snapshots	spanId	character varying	YES	
+instance_ai_threads	id	uuid	NO	
+instance_ai_threads	resourceId	character varying	NO	
+instance_ai_threads	title	text	NO	''::text
+instance_ai_threads	metadata	json	YES	
+instance_ai_threads	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_threads	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_workflow_snapshots	runId	character varying	NO	
+instance_ai_workflow_snapshots	workflowName	character varying	NO	
+instance_ai_workflow_snapshots	resourceId	character varying	YES	
+instance_ai_workflow_snapshots	status	character varying	YES	
+instance_ai_workflow_snapshots	snapshot	text	NO	
+instance_ai_workflow_snapshots	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_ai_workflow_snapshots	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+instance_version_history	id	integer	NO	nextval('instance_version_history_id_seq'::regclass)
+instance_version_history	major	integer	NO	
+instance_version_history	minor	integer	NO	
+instance_version_history	patch	integer	NO	
+instance_version_history	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+invalid_auth_token	token	character varying	NO	
+invalid_auth_token	expiresAt	timestamp with time zone	NO	
+mcp_registry_server	slug	character varying	NO	
+mcp_registry_server	status	character varying	NO	
+mcp_registry_server	version	character varying	NO	
+mcp_registry_server	registryUpdatedAt	timestamp without time zone	NO	
+mcp_registry_server	data	json	NO	'{}'::json
+mcp_registry_server	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+mcp_registry_server	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+migrations	id	integer	NO	nextval('migrations_id_seq'::regclass)
+migrations	timestamp	bigint	NO	
+migrations	name	character varying	NO	
+oauth_access_tokens	token	character varying	NO	
+oauth_access_tokens	clientId	character varying	NO	
+oauth_access_tokens	userId	uuid	NO	
+oauth_authorization_codes	code	character varying	NO	
+oauth_authorization_codes	clientId	character varying	NO	
+oauth_authorization_codes	userId	uuid	NO	
+oauth_authorization_codes	redirectUri	character varying	NO	
+oauth_authorization_codes	codeChallenge	character varying	NO	
+oauth_authorization_codes	codeChallengeMethod	character varying	NO	
+oauth_authorization_codes	expiresAt	bigint	NO	
+oauth_authorization_codes	state	character varying	YES	
+oauth_authorization_codes	used	boolean	NO	false
+oauth_authorization_codes	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+oauth_authorization_codes	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+oauth_clients	id	character varying	NO	
+oauth_clients	name	character varying	NO	
+oauth_clients	redirectUris	json	NO	
+oauth_clients	grantTypes	json	NO	
+oauth_clients	clientSecret	character varying	YES	
+oauth_clients	clientSecretExpiresAt	bigint	YES	
+oauth_clients	tokenEndpointAuthMethod	character varying	NO	'none'::character varying
+oauth_clients	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+oauth_clients	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+oauth_refresh_tokens	token	character varying	NO	
+oauth_refresh_tokens	clientId	character varying	NO	
+oauth_refresh_tokens	userId	uuid	NO	
+oauth_refresh_tokens	expiresAt	bigint	NO	
+oauth_refresh_tokens	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+oauth_refresh_tokens	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+oauth_user_consents	id	integer	NO	
+oauth_user_consents	userId	uuid	NO	
+oauth_user_consents	clientId	character varying	NO	
+oauth_user_consents	grantedAt	bigint	NO	
+outbound_messages	id	bigint	NO	nextval('outbound_messages_id_seq'::regclass)
+outbound_messages	restaurant_id	bigint	YES	
+outbound_messages	conversation_id	text	NO	
+outbound_messages	source	text	NO	
+outbound_messages	channel	text	NO	
+outbound_messages	provider	text	YES	
+outbound_messages	recipient	text	YES	
+outbound_messages	sender	text	YES	
+outbound_messages	subject	text	YES	
+outbound_messages	content	text	NO	
+outbound_messages	payload	jsonb	YES	
+outbound_messages	status	text	NO	'pending'::text
+outbound_messages	created_at	timestamp with time zone	NO	now()
+outbound_messages	updated_at	timestamp with time zone	NO	now()
+processed_data	workflowId	character varying	NO	
+processed_data	context	character varying	NO	
+processed_data	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+processed_data	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+processed_data	value	text	NO	
+project	id	character varying	NO	
+project	name	character varying	NO	
+project	type	character varying	NO	
+project	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+project	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+project	icon	json	YES	
+project	description	character varying	YES	
+project	creatorId	uuid	YES	
+project	customTelemetryTags	json	NO	'[]'::json
+project_relation	projectId	character varying	NO	
+project_relation	userId	uuid	NO	
+project_relation	role	character varying	NO	
+project_relation	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+project_relation	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+project_secrets_provider_access	secretsProviderConnectionId	integer	NO	
+project_secrets_provider_access	projectId	character varying	NO	
+project_secrets_provider_access	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+project_secrets_provider_access	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+project_secrets_provider_access	role	character varying	NO	'secretsProviderConnection:user'::character varying
+reservations	id	bigint	NO	nextval('reservations_id_seq'::regclass)
+reservations	restaurant_id	bigint	NO	
+reservations	client_id	bigint	YES	
+reservations	start_time	timestamp with time zone	NO	
+reservations	end_time	timestamp with time zone	NO	
+reservations	party_size	integer	NO	
+reservations	status	text	NO	'confirmed'::text
+reservations	source_channel	text	NO	'webhook'::text
+reservations	meal_duration_minutes	integer	NO	120
+reservations	cleaning_buffer_minutes	integer	NO	15
+reservations	grace_delay_minutes	integer	NO	10
+reservations	special_request	text	YES	
+reservations	created_at	timestamp with time zone	NO	now()
+reservations	updated_at	timestamp with time zone	NO	now()
+reservations	table_id	bigint	YES	
+reservations	area_id	bigint	YES	
+reservations	booking_source	text	YES	
+reservations	created_by	text	YES	
+reservations	source	text	YES	
+reservations	conversation_id	text	YES	
+restaurant_channels	id	bigint	NO	nextval('restaurant_channels_id_seq'::regclass)
+restaurant_channels	restaurant_id	bigint	NO	
+restaurant_channels	channel_type	text	NO	
+restaurant_channels	channel_value	text	NO	
+restaurant_channels	is_active	boolean	NO	true
+restaurant_channels	created_at	timestamp with time zone	NO	now()
+restaurant_channels	updated_at	timestamp with time zone	NO	now()
+restaurant_closures	id	bigint	NO	nextval('restaurant_closures_id_seq'::regclass)
+restaurant_closures	restaurant_id	bigint	NO	
+restaurant_closures	starts_at	timestamp with time zone	NO	
+restaurant_closures	ends_at	timestamp with time zone	NO	
+restaurant_closures	reason	text	YES	
+restaurant_closures	created_at	timestamp with time zone	NO	now()
+restaurant_closures	updated_at	timestamp with time zone	NO	now()
+restaurant_closures	is_active	boolean	NO	true
+restaurant_closures	closure_type	text	YES	
+restaurant_closures	recurrence_rule	text	YES	
+restaurant_settings	id	bigint	NO	nextval('restaurant_settings_id_seq'::regclass)
+restaurant_settings	restaurant_id	bigint	NO	
+restaurant_settings	default_meal_duration_minutes	integer	NO	120
+restaurant_settings	cleaning_buffer_minutes	integer	NO	15
+restaurant_settings	grace_delay_minutes	integer	NO	10
+restaurant_settings	max_party_size	integer	NO	12
+restaurant_settings	reminder_days_before	integer	NO	1
+restaurant_settings	reminder_hour	integer	NO	9
+restaurant_settings	reminder_channel	text	NO	'whatsapp'::text
+restaurant_settings	created_at	timestamp with time zone	NO	now()
+restaurant_settings	updated_at	timestamp with time zone	NO	now()
+restaurant_settings	allow_combined_tables	boolean	NO	false
+restaurant_settings	booking_policy	jsonb	YES	
+restaurant_settings	event_notification_policy	jsonb	YES	
+restaurants	id	bigint	NO	nextval('restaurants_id_seq'::regclass)
+restaurants	name	text	NO	
+restaurants	slug	text	NO	
+restaurants	timezone	text	NO	'Europe/Paris'::text
+restaurants	is_active	boolean	NO	true
+restaurants	created_at	timestamp with time zone	NO	now()
+restaurants	updated_at	timestamp with time zone	NO	now()
+role	slug	character varying	NO	
+role	displayName	text	YES	
+role	description	text	YES	
+role	roleType	text	YES	
+role	systemRole	boolean	NO	false
+role	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+role	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+role_mapping_rule	id	character varying	NO	
+role_mapping_rule	expression	text	NO	
+role_mapping_rule	role	character varying	NO	
+role_mapping_rule	type	character varying	NO	
+role_mapping_rule	order	integer	NO	
+role_mapping_rule	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+role_mapping_rule	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+role_mapping_rule_project	roleMappingRuleId	character varying	NO	
+role_mapping_rule_project	projectId	character varying	NO	
+role_scope	roleSlug	character varying	NO	
+role_scope	scopeSlug	character varying	NO	
+scope	slug	character varying	NO	
+scope	displayName	text	YES	
+scope	description	text	YES	
+secrets_provider_connection	id	integer	NO	
+secrets_provider_connection	providerKey	character varying	NO	
+secrets_provider_connection	type	character varying	NO	
+secrets_provider_connection	encryptedSettings	text	NO	
+secrets_provider_connection	isEnabled	boolean	NO	false
+secrets_provider_connection	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+secrets_provider_connection	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+settings	key	character varying	NO	
+settings	value	text	NO	
+settings	loadOnStartup	boolean	NO	false
+shared_credentials	credentialsId	character varying	NO	
+shared_credentials	projectId	character varying	NO	
+shared_credentials	role	text	NO	
+shared_credentials	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+shared_credentials	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+shared_workflow	workflowId	character varying	NO	
+shared_workflow	projectId	character varying	NO	
+shared_workflow	role	text	NO	
+shared_workflow	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+shared_workflow	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+tag_entity	name	character varying	NO	
+tag_entity	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+tag_entity	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+tag_entity	id	character varying	NO	
+test_case_execution	id	character varying	NO	
+test_case_execution	testRunId	character varying	NO	
+test_case_execution	executionId	integer	YES	
+test_case_execution	status	character varying	NO	
+test_case_execution	runAt	timestamp with time zone	YES	
+test_case_execution	completedAt	timestamp with time zone	YES	
+test_case_execution	errorCode	character varying	YES	
+test_case_execution	errorDetails	json	YES	
+test_case_execution	metrics	json	YES	
+test_case_execution	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+test_case_execution	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+test_case_execution	inputs	json	YES	
+test_case_execution	outputs	json	YES	
+test_case_execution	runIndex	integer	YES	
+test_run	id	character varying	NO	
+test_run	workflowId	character varying	NO	
+test_run	status	character varying	NO	
+test_run	errorCode	character varying	YES	
+test_run	errorDetails	json	YES	
+test_run	runAt	timestamp with time zone	YES	
+test_run	completedAt	timestamp with time zone	YES	
+test_run	metrics	json	YES	
+test_run	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+test_run	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+test_run	runningInstanceId	character varying	YES	
+test_run	cancelRequested	boolean	NO	false
+test_run	workflowVersionId	character varying	YES	
+test_run	evaluationConfigId	character varying	YES	
+test_run	evaluationConfigSnapshot	jsonb	YES	
+test_run	collectionId	character varying	YES	
+token_exchange_jti	jti	character varying	NO	
+token_exchange_jti	expiresAt	timestamp with time zone	NO	
+token_exchange_jti	createdAt	timestamp with time zone	NO	
+trusted_key	sourceId	character varying	NO	
+trusted_key	kid	character varying	NO	
+trusted_key	data	text	NO	
+trusted_key	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+trusted_key_source	id	character varying	NO	
+trusted_key_source	type	character varying	NO	
+trusted_key_source	config	text	NO	
+trusted_key_source	status	character varying	NO	'pending'::character varying
+trusted_key_source	lastError	text	YES	
+trusted_key_source	lastRefreshedAt	timestamp with time zone	YES	
+trusted_key_source	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+trusted_key_source	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+user	id	uuid	NO	gen_random_uuid()
+user	email	character varying	YES	
+user	firstName	character varying	YES	
+user	lastName	character varying	YES	
+user	password	character varying	YES	
+user	personalizationAnswers	json	YES	
+user	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+user	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+user	settings	json	YES	
+user	disabled	boolean	NO	false
+user	mfaEnabled	boolean	NO	false
+user	mfaSecret	text	YES	
+user	mfaRecoveryCodes	text	YES	
+user	lastActiveAt	date	YES	
+user	roleSlug	character varying	NO	'global:member'::character varying
+user_api_keys	id	character varying	NO	
+user_api_keys	userId	uuid	NO	
+user_api_keys	label	character varying	NO	
+user_api_keys	apiKey	character varying	NO	
+user_api_keys	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+user_api_keys	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+user_api_keys	scopes	json	YES	
+user_api_keys	audience	character varying	NO	'public-api'::character varying
+user_api_keys	lastUsedAt	timestamp with time zone	YES	
+user_favorites	id	integer	NO	
+user_favorites	userId	uuid	NO	
+user_favorites	resourceId	character varying	NO	
+user_favorites	resourceType	character varying	NO	
+variables	key	character varying	NO	
+variables	type	character varying	NO	'string'::character varying
+variables	value	text	YES	
+variables	id	character varying	NO	
+variables	projectId	character varying	YES	
+webhook_entity	webhookPath	character varying	NO	
+webhook_entity	method	character varying	NO	
+webhook_entity	node	character varying	NO	
+webhook_entity	webhookId	character varying	YES	
+webhook_entity	pathLength	integer	YES	
+webhook_entity	workflowId	character varying	NO	
+workflow_builder_session	id	uuid	NO	
+workflow_builder_session	workflowId	character varying	NO	
+workflow_builder_session	userId	uuid	NO	
+workflow_builder_session	messages	json	NO	'[]'::json
+workflow_builder_session	previousSummary	text	YES	
+workflow_builder_session	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_builder_session	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_builder_session	activeVersionCardId	character varying	YES	
+workflow_builder_session	resumeAfterRestoreMessageId	character varying	YES	
+workflow_dependency	id	integer	NO	
+workflow_dependency	workflowId	character varying	NO	
+workflow_dependency	workflowVersionId	integer	NO	
+workflow_dependency	dependencyType	character varying	NO	
+workflow_dependency	dependencyKey	character varying	NO	
+workflow_dependency	dependencyInfo	json	YES	
+workflow_dependency	indexVersionId	smallint	NO	1
+workflow_dependency	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_dependency	publishedVersionId	character varying	YES	
+workflow_entity	name	character varying	NO	
+workflow_entity	active	boolean	NO	
+workflow_entity	nodes	json	NO	
+workflow_entity	connections	json	NO	
+workflow_entity	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_entity	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_entity	settings	json	YES	
+workflow_entity	staticData	json	YES	
+workflow_entity	pinData	json	YES	
+workflow_entity	versionId	character	NO	
+workflow_entity	triggerCount	integer	NO	0
+workflow_entity	id	character varying	NO	
+workflow_entity	meta	json	YES	
+workflow_entity	parentFolderId	character varying	YES	NULL::character varying
+workflow_entity	isArchived	boolean	NO	false
+workflow_entity	versionCounter	integer	NO	1
+workflow_entity	description	text	YES	
+workflow_entity	activeVersionId	character varying	YES	
+workflow_entity	nodeGroups	json	NO	'[]'::json
+workflow_entity	sourceWorkflowId	character varying	YES	
+workflow_history	versionId	character varying	NO	
+workflow_history	workflowId	character varying	NO	
+workflow_history	authors	character varying	NO	
+workflow_history	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_history	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_history	nodes	json	NO	
+workflow_history	connections	json	NO	
+workflow_history	name	character varying	YES	
+workflow_history	autosaved	boolean	NO	false
+workflow_history	description	text	YES	
+workflow_history	nodeGroups	json	NO	'[]'::json
+workflow_publication_outbox	id	integer	NO	
+workflow_publication_outbox	workflowId	character varying	NO	
+workflow_publication_outbox	publishedVersionId	character varying	NO	
+workflow_publication_outbox	status	character varying	NO	
+workflow_publication_outbox	errorMessage	text	YES	
+workflow_publication_outbox	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_publication_outbox	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_publish_history	id	integer	NO	
+workflow_publish_history	workflowId	character varying	NO	
+workflow_publish_history	versionId	character varying	YES	
+workflow_publish_history	event	character varying	NO	
+workflow_publish_history	userId	uuid	YES	
+workflow_publish_history	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_published_version	workflowId	character varying	NO	
+workflow_published_version	publishedVersionId	character varying	NO	
+workflow_published_version	createdAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_published_version	updatedAt	timestamp with time zone	NO	CURRENT_TIMESTAMP(3)
+workflow_statistics	count	bigint	YES	0
+workflow_statistics	latestEvent	timestamp with time zone	YES	
+workflow_statistics	name	character varying	NO	
+workflow_statistics	workflowId	character varying	NO	
+workflow_statistics	rootCount	bigint	YES	0
+workflow_statistics	id	integer	NO	nextval('workflow_statistics_id_seq'::regclass)
+workflow_statistics	workflowName	character varying	YES	
+workflows_tags	workflowId	character varying	NO	
+workflows_tags	tagId	character varying	NO	

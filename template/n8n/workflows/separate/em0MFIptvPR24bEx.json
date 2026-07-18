@@ -1,0 +1,549 @@
+{
+  "updatedAt": "2026-06-12T09:07:54.425Z",
+  "createdAt": "2026-06-12T08:54:01.530Z",
+  "id": "em0MFIptvPR24bEx",
+  "name": "Reservation AI Router v1",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reservation-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "Webhook",
+      "name": "Webhook Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        224,
+        320
+      ],
+      "webhookId": "9309696a-38c9-4805-9267-6a16fa01a675"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\n\nfunction toNull(v) {\n  return v === undefined || v === null || v === '' ? null : v;\n}\n\nreturn [{\n  json: {\n    source: toNull(body.source),\n    channel: toNull(body.channel) ?? toNull(body.source),\n    restaurant_slug: toNull(body.restaurant_slug),\n    to: toNull(body.to),\n    from: toNull(body.from),\n    phone: toNull(body.phone) ?? toNull(body.from),\n    email: toNull(body.email),\n    full_name: toNull(body.full_name),\n    message: toNull(body.message) ?? '',\n    raw_message: toNull(body.message) ?? '',\n    intent: toNull(body.intent) ?? 'reservation_request',\n    requested_datetime: toNull(body.requested_datetime),\n    party_size: body.party_size ?? null,\n    special_request: toNull(body.special_request),\n    call_id: toNull(body.call_id),\n    call_status: toNull(body.call_status)\n  }\n}];"
+      },
+      "id": "NormalizeInput",
+      "name": "Normalize Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.restaurant_slug}}",
+              "operation": "notEmpty"
+            }
+          ],
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          }
+        },
+        "options": {}
+      },
+      "id": "HasSlug",
+      "name": "Has restaurant_slug?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        688,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  r.id AS restaurant_id,\n  r.slug,\n  r.name,\n  r.timezone,\n  s.default_meal_duration_minutes,\n  s.cleaning_buffer_minutes,\n  s.grace_delay_minutes,\n  s.max_party_size,\n  s.allow_combined_tables,\n  s.reminder_days_before,\n  s.reminder_hour,\n  s.reminder_channel,\n  s.booking_policy,\n  s.event_notification_policy\nFROM restaurants r\nJOIN restaurant_settings s ON s.restaurant_id = r.id\nWHERE r.slug = '{{$json.restaurant_slug}}'\n  AND r.is_active = true\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "LookupBySlug",
+      "name": "Lookup Restaurant by Slug",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        928,
+        192
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  r.id AS restaurant_id,\n  r.slug,\n  r.name,\n  r.timezone,\n  s.default_meal_duration_minutes,\n  s.cleaning_buffer_minutes,\n  s.grace_delay_minutes,\n  s.max_party_size,\n  s.allow_combined_tables,\n  s.reminder_days_before,\n  s.reminder_hour,\n  s.reminder_channel,\n  s.booking_policy,\n  s.event_notification_policy\nFROM restaurant_channels c\nJOIN restaurants r ON r.id = c.restaurant_id\nJOIN restaurant_settings s ON s.restaurant_id = r.id\nWHERE c.is_active = true\n  AND c.channel_type = '{{$json.source}}'\n  AND c.channel_value = '{{$json.to}}'\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "LookupByChannel",
+      "name": "Lookup Restaurant by Channel",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        928,
+        512
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nreturn [{\n  json: {\n    restaurant_id: input.restaurant_id ?? null,\n    restaurant_slug: input.slug ?? null,\n    restaurant_name: input.name ?? null,\n    timezone: input.timezone ?? 'Europe/Paris',\n    default_meal_duration_minutes: input.default_meal_duration_minutes ?? 120,\n    cleaning_buffer_minutes: input.cleaning_buffer_minutes ?? 15,\n    grace_delay_minutes: input.grace_delay_minutes ?? 10,\n    max_party_size: input.max_party_size ?? 12,\n    allow_combined_tables: input.allow_combined_tables ?? false,\n    reminder_days_before: input.reminder_days_before ?? 1,\n    reminder_hour: input.reminder_hour ?? 9,\n    reminder_channel: input.reminder_channel ?? 'whatsapp',\n    booking_policy: input.booking_policy ?? null,\n    event_notification_policy: input.event_notification_policy ?? null,\n    source: input.source ?? null,\n    channel: input.channel ?? null,\n    to: input.to ?? null,\n    from: input.from ?? null,\n    phone: input.phone ?? null,\n    email: input.email ?? null,\n    full_name: input.full_name ?? null,\n    message: input.message ?? '',\n    raw_message: input.raw_message ?? '',\n    intent: input.intent ?? 'reservation_request',\n    requested_datetime: input.requested_datetime ?? null,\n    party_size: input.party_size ?? null,\n    special_request: input.special_request ?? null,\n    call_id: input.call_id ?? null,\n    call_status: input.call_status ?? null\n  }\n}];"
+      },
+      "id": "NormalizeRestaurantContext",
+      "name": "Normalize Restaurant Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.restaurant_id}}",
+              "operation": "notEmpty"
+            }
+          ],
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          }
+        },
+        "options": {}
+      },
+      "id": "RestaurantFound",
+      "name": "Restaurant Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM restaurant_closures\nWHERE restaurant_id = {{$json.restaurant_id}}\n  AND is_active = true\n  AND starts_at <= '{{$json.requested_datetime}}'::timestamptz\n  AND ends_at > '{{$json.requested_datetime}}'::timestamptz\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "CheckClosure",
+      "name": "Check Closure",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        -80
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.decision}}",
+              "operation": "equals",
+              "value2": "confirm"
+            }
+          ],
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          }
+        },
+        "options": {}
+      },
+      "id": "DecisionConfirm",
+      "name": "Decision = confirm?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM clients\nWHERE restaurant_id = {{$('Normalize Restaurant Context').item.json.restaurant_id}}\nAND (\n  ('{{$('Normalize Restaurant Context').item.json.phone || \"\"}}' <> '' AND phone = '{{$('Normalize Restaurant Context').item.json.phone}}')\n  OR\n  ('{{$('Normalize Restaurant Context').item.json.email || \"\"}}' <> '' AND email = '{{$('Normalize Restaurant Context').item.json.email}}')\n)\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "FindClient",
+      "name": "Find Client",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        -32
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.id}}",
+              "operation": "notEmpty"
+            }
+          ],
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          }
+        },
+        "options": {}
+      },
+      "id": "ClientFound",
+      "name": "Client Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO clients (\n  restaurant_id,\n  full_name,\n  phone,\n  email,\n  is_new_customer,\n  consent_notifications,\n  consent_marketing,\n  created_at,\n  updated_at\n)\nVALUES (\n  {{$('Normalize Restaurant Context').item.json.restaurant_id}},\n  COALESCE(NULLIF('{{$('Normalize Restaurant Context').item.json.full_name || \"\"}}', ''), 'Client'),\n  NULLIF('{{$('Normalize Restaurant Context').item.json.phone || \"\"}}', ''),\n  NULLIF('{{$('Normalize Restaurant Context').item.json.email || \"\"}}', ''),\n  TRUE,\n  TRUE,\n  FALSE,\n  NOW(),\n  NOW()\n)\nRETURNING *;",
+        "options": {}
+      },
+      "id": "CreateClient",
+      "name": "Create Client",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        2896,
+        80
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "oIKfFfyMDZkHhOm4",
+          "name": "Postgres Little Africa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"restaurant_id\": {{$('Normalize Restaurant Context').item.json.restaurant_id}},\n  \"decision\": {{$json.decision ?? 'unknown'}},\n  \"reply\": {{$json.reply ?? 'ok'}}\n}",
+        "options": {}
+      },
+      "id": "Respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3072,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1904,
+        -80
+      ],
+      "id": "32dbad10-5cb8-42ff-aaa7-b1701ffcc686",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1776,
+        128
+      ],
+      "id": "11182897-607d-4569-ba6f-4280ed0e0d51",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bwymyf0M179cgw6O",
+          "name": "OpenAI account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Inbound": {
+      "main": [
+        [
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Input": {
+      "main": [
+        [
+          {
+            "node": "Has restaurant_slug?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has restaurant_slug?": {
+      "main": [
+        [
+          {
+            "node": "Lookup Restaurant by Slug",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Lookup Restaurant by Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Restaurant by Slug": {
+      "main": [
+        [
+          {
+            "node": "Normalize Restaurant Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Restaurant by Channel": {
+      "main": [
+        [
+          {
+            "node": "Normalize Restaurant Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Restaurant Context": {
+      "main": [
+        [
+          {
+            "node": "Restaurant Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restaurant Found?": {
+      "main": [
+        [
+          {
+            "node": "Check Closure",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Closure": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision = confirm?": {
+      "main": [
+        [
+          {
+            "node": "Find Client",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Client": {
+      "main": [
+        [
+          {
+            "node": "Client Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Found?": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Decision = confirm?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "9aa26f4a-93ca-426c-86b0-262c28d51a63",
+  "activeVersionId": null,
+  "versionCounter": 17,
+  "triggerCount": 0,
+  "sourceWorkflowId": null,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T17:50:56.849Z",
+      "createdAt": "2026-07-18T17:50:56.849Z",
+      "role": "workflow:owner",
+      "workflowId": "em0MFIptvPR24bEx",
+      "projectId": "qCyrAhwkn3YBEnnC",
+      "project": {
+        "updatedAt": "2026-07-18T16:53:40.765Z",
+        "createdAt": "2026-06-26T07:15:48.107Z",
+        "id": "qCyrAhwkn3YBEnnC",
+        "name": "Jérémy Lemaire <lemaire.jerem@orange.fr>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "customTelemetryTags": [],
+        "creatorId": "1c348afe-df46-47f4-b6d4-933ef081ab0d"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

@@ -1,0 +1,15 @@
+{
+"agent_name": "Agent Conversationnel Vocal RESTAURANT_NAME",
+"language": "fr-FR",
+"webhook_url": "https://BASE_DOMAIN/CLIENT_ID/webhook/retell-voice-function",
+"restaurant_slug": "RESTAURANT_SLUG",
+"restaurant_name": "RESTAURANT_NAME",
+"tools": [
+"get_restaurant_context",
+"resolve_reservation_datetime",
+"check_availability",
+"create_reservation",
+"log_conversation"
+],
+"notes": "Template documentaire. Le JSON final Retell sera généré plus tard avec les vrais IDs Retell."
+}
