@@ -34,7 +34,7 @@ https://<base_domain>/<client_id>/webhook/retell-voice-function
 
 Exemple :
 
-https://cyber-saas-private.ddnsfree.com/little_africa_nice/webhook/retell-voice-function
+https://mydomaine.com/resto_demo/webhook/retell-voice-function
 Route Caddy attendue
 
 Le préfixe client doit être conservé jusqu’à n8n, sauf le préfixe public du tenant :
