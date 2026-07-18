@@ -1,9 +1,9 @@
-
-Template tenant SaaS
+# Template tenant SaaS
 
 Ce dossier contient le modèle utilisé pour créer un nouveau client.
 
-Contenu
+## Contenu
+```sh
 template/
 ├── caddy/
 ├── docker/
@@ -12,6 +12,8 @@ template/
 ├── retell/
 ├── sql/
 └── tests/
+```
+
 À générer par client
 
 Les valeurs suivantes doivent être remplacées :
@@ -25,11 +27,14 @@ __POSTGRES_DB__
 __POSTGRES_USER__
 __POSTGRES_PASSWORD__
 __N8N_ENCRYPTION_KEY__
-Commande type
+
+## Commande type
+```sh
 bash /root/saas_factory/scripts/create-tenant.sh \
   --client-id demo_restaurant_01 \
   --restaurant-slug demo-restaurant \
   --restaurant-name "Restaurant Démo" \
-  --base-domain cyber-saas-private.ddnsfree.com \
+  --base-domain mydomain.com \
+```
   --tls-email admin@example.com
 
