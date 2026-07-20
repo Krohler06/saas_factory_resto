@@ -63,3 +63,18 @@ automatisation ultérieure via API n8n ;
 génération contrôlée via script dédié.
 
 Pour l’instant, la factory privilégie une base saine sans secrets.
+
+## Changer version de N8N dans le fichier pour figer la version
+cp config/factory.example.yml config/factory.yml
+vim config/factory.yml
+
+scripts/new-tenant-wizard.sh
+
+scripts/deploy-tenant.sh \
+  --tenant tenants/private/<client_id>.yml \
+  --factory config/factory.yml \
+  --dry-run
+
+scripts/deploy-tenant.sh \
+  --tenant tenants/private/<client_id>.yml \
+  --factory config/factory.yml

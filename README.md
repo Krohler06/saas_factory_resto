@@ -79,12 +79,6 @@ bash scripts/git-init-safe.sh
 ```
 5. Créer un nouveau tenant
 ```sh
-bash /root/saas_factory/scripts/create-tenant.sh \
-  --client-id demo_restaurant_01 \
-  --restaurant-slug demo-restaurant \
-  --restaurant-name "Restaurant Démo" \
-  --base-domain __BASE_DOMAIN__ \
-  --tls-email admin@example.com
 ```
 ## Règle importante
 
