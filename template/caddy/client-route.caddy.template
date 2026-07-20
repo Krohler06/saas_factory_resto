@@ -1,11 +1,9 @@
+# Managed by saas_factory for @@CLIENT_ID@@
+# Ce snippet doit être importé depuis le bloc du domaine partagé.
 
-Route tenant CLIENT_ID
+redir /@@TENANT_PATH@@ /@@TENANT_PATH@@/ 308
 
-handle /CLIENT_ID/webhook/* {
-uri strip_prefix /CLIENT_ID
-reverse_proxy __CLIENT_ID___n8n:5678
+handle /@@TENANT_PATH@@/* {
+    reverse_proxy @@N8N_CONTAINER@@:5678
 }
 
-handle_path /CLIENT_ID/* {
-reverse_proxy __CLIENT_ID___n8n:5678
-}

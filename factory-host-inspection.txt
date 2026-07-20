@@ -1,0 +1,40 @@
+============================================================
+CONTENEUR CADDY
+============================================================
+Nom=/edge-caddy Image=caddy:2 Etat=running
+
+============================================================
+RESEAUX DU CONTENEUR CADDY
+============================================================
+saas_net
+
+
+============================================================
+MONTAGES DU CONTENEUR CADDY
+============================================================
+/var/lib/docker/volumes/caddy_caddy_data/_data  ->  /data
+/opt/caddy/Caddyfile  ->  /etc/caddy/Caddyfile
+/var/lib/docker/volumes/caddy_caddy_config/_data  ->  /config
+
+
+============================================================
+RESEAUX DOCKER DISPONIBLES
+============================================================
+NAME                             DRIVER    SCOPE
+bridge                           bridge    local
+homelab-exporters_default        bridge    local
+host                             host      local
+none                             null      local
+observability_default            bridge    local
+restaurant-booking-poc_default   bridge    local
+saas_net                         bridge    local
+
+============================================================
+VALIDATION CADDY
+============================================================
+Valid configuration
+
+Renseigne ensuite config/factory.yml avec :
+- le réseau partagé avec Caddy ;
+- le répertoire hôte des routes ;
+- le chemin du Caddyfile dans le conteneur.

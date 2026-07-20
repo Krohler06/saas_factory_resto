@@ -94,3 +94,36 @@ Ne jamais commiter :
 - credentials n8n ;
 - exports bruts ;
 - fichiers contenant mots de passe, tokens, clés API ou secrets.
+
+
+# SaaS Factory — Infrastructure Generator V1
+
+Ce package ne contient pas d'installateur. Copiez les fichiers dans les mêmes
+répertoires sous `/root/saas_factory`.
+
+```bash
+mkdir -p \
+  /root/saas_factory/config \
+  /root/saas_factory/docs \
+  /root/saas_factory/scripts \
+  /root/saas_factory/template/docker \
+  /root/saas_factory/template/caddy \
+  /root/saas_factory/template/env
+
+cp -a config/factory.example.yml /root/saas_factory/config/
+cp -a docs/INFRASTRUCTURE_GENERATOR.md /root/saas_factory/docs/
+cp -a scripts/* /root/saas_factory/scripts/
+cp -a template/docker/docker-compose.yml.template /root/saas_factory/template/docker/
+cp -a template/caddy/client-route.caddy.template /root/saas_factory/template/caddy/
+cp -a template/env/.env.template /root/saas_factory/template/env/
+
+chmod +x /root/saas_factory/scripts/*.sh
+chmod +x /root/saas_factory/scripts/render-tenant-infrastructure.py
+```
+
+Lire ensuite :
+
+```text
+/root/saas_factory/docs/INFRASTRUCTURE_GENERATOR.md
+```
+

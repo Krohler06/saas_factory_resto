@@ -1,0 +1,26 @@
+version: 1
+
+factory:
+  clients_root: /opt/clients
+  base_domain: example.com
+
+  edge_network: edge
+  create_edge_network: false
+
+  # Épingler une version précise avant la production.
+  n8n_image: docker.n8n.io/n8nio/n8n:latest
+  postgres_image: postgres:16
+  n8n_log_level: info
+
+  caddy:
+    enabled: true
+    container_name: edge-caddy
+    routes_host_dir: /opt/edge-caddy/routes/tenants
+    container_config_path: /etc/caddy/Caddyfile
+    reload: true
+
+  deployment:
+    wait_timeout_seconds: 180
+    import_workflows: true
+    smoke_test: true
+
