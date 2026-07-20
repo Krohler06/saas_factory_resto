@@ -38,7 +38,7 @@ create-tenant.sh \
 --client-id demo_restaurant_01 \
 --restaurant-slug demo-restaurant \
 --restaurant-name "Restaurant Démo" \
---base-domain cyber-saas-private.ddnsfree.com \
+--base-domain __BASE_DOMAIN__ \
 --tls-email admin@example.com
 USAGE
 exit 1

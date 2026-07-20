@@ -1,0 +1,6 @@
+restaurant_service_definitions
+restaurant_service_hours
+restaurant_areas
+restaurant_area_aliases
+restaurant_tables
+reservation_tables

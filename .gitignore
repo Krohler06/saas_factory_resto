@@ -36,3 +36,6 @@ exports/
 Thumbs.db
 .vscode/
 .idea/
+
+# Tenant configurations containing real infrastructure/customer data
+tenants/private/

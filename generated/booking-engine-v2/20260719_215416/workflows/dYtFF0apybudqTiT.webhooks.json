@@ -1,0 +1,167 @@
+{
+  "workflow_id": "dYtFF0apybudqTiT",
+  "workflow_name": "reservation_multichannel_router_little_africa_v2",
+  "active": true,
+  "webhook_nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "retell-voice-function",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f8647c9a-f89a-4943-b5b7-d0b0555ca671",
+      "name": "Webhook Retell Voice Function",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        432
+      ],
+      "webhookId": "dfee2ad0-a060-4ed5-8c4f-9fd9fe9b99bb"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "retell-sms-function",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "0eb8d5a9-c119-413e-ac0a-50aa51f2d250",
+      "name": "Webhook Retell SMS Function",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        640
+      ],
+      "webhookId": "6ba88bb0-937f-40a5-9ec6-c88cb49e0928"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reservation-email-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e7d59c8c-ff20-4279-8db8-859f80ef3a39",
+      "name": "Webhook Email Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        864
+      ],
+      "webhookId": "ece7d420-73f4-4593-8e52-7c6080601c9f"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reservation-instagram-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b4f4068f-2c5a-4d67-a21e-6fd0d2addaf6",
+      "name": "Webhook Instagram Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        1088
+      ],
+      "webhookId": "91a9b175-1a1e-491e-b91f-abad592c3f81"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reservation-generic-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "38a3edfe-7260-47a9-b0f4-dff2cbc640e6",
+      "name": "Webhook Generic Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        1312
+      ],
+      "webhookId": "9a3afaf3-f848-43ed-a4e8-2abbff46eeba"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Build Unified Business Response').item.json }}",
+        "options": {}
+      },
+      "id": "d3ac4dfb-e898-4634-927d-5bb1ae588fd5",
+      "name": "Respond To Retell Voice",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        4528,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Build Unified Business Response').item.json }}",
+        "options": {}
+      },
+      "id": "70091dba-1ab3-4b87-ab4d-859fdbc66899",
+      "name": "Respond To Retell SMS",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        4800,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Build Unified Business Response').item.json }}",
+        "options": {}
+      },
+      "id": "5e79a59c-8a22-4fd5-b741-c9ff8bbe58b8",
+      "name": "Respond To Instagram Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        5088,
+        928
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Build Unified Business Response').item.json }}",
+        "options": {}
+      },
+      "id": "82a24bc7-276b-403b-b4e2-64e4b90f962a",
+      "name": "Respond To Email Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        5360,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Build Unified Business Response').item.json }}",
+        "options": {}
+      },
+      "id": "acd2001b-1f15-4518-9c09-862cc5054d79",
+      "name": "Respond To Generic Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        5360,
+        1328
+      ]
+    }
+  ]
+}

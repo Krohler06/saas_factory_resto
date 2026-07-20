@@ -1,0 +1,175 @@
+version: 1
+
+tenant:
+  client_id: restaurant-demo
+  restaurant_slug: restaurant-demo
+  restaurant_name: Restaurant Démo
+
+restaurant:
+  timezone: Europe/Paris
+  active: true
+
+booking_engine:
+  allocation_mode: area_capacity
+  minimum_advance_minutes: 60
+  maximum_advance_days: 90
+  max_party_size: 12
+  default_slot_interval_minutes: 15
+  default_cleaning_buffer_minutes: 15
+  allow_table_combinations: false
+  maximum_combined_tables: 1
+
+service_definitions:
+  - slug: lunch
+    name: Déjeuner
+    default_duration_minutes: 120
+  - slug: dinner
+    name: Dîner
+    default_duration_minutes: 120
+
+weekly_schedule:
+  monday:
+    enabled: true
+    services:
+      lunch:
+        enabled: true
+        opens_at: "11:30"
+        first_booking_at: "12:00"
+        last_booking_at: "13:30"
+        closes_at: "15:00"
+      dinner:
+        enabled: true
+        opens_at: "18:30"
+        first_booking_at: "19:00"
+        last_booking_at: "21:30"
+        closes_at: "23:30"
+
+  tuesday:
+    enabled: true
+    services:
+      lunch:
+        enabled: true
+        opens_at: "11:30"
+        first_booking_at: "12:00"
+        last_booking_at: "13:30"
+        closes_at: "15:00"
+      dinner:
+        enabled: true
+        opens_at: "18:30"
+        first_booking_at: "19:00"
+        last_booking_at: "21:30"
+        closes_at: "23:30"
+
+  wednesday:
+    enabled: true
+    services:
+      lunch:
+        enabled: true
+        opens_at: "11:30"
+        first_booking_at: "12:00"
+        last_booking_at: "13:30"
+        closes_at: "15:00"
+      dinner:
+        enabled: false
+
+  thursday:
+    enabled: true
+    services:
+      lunch:
+        enabled: true
+        opens_at: "11:30"
+        first_booking_at: "12:00"
+        last_booking_at: "13:30"
+        closes_at: "15:00"
+      dinner:
+        enabled: true
+        opens_at: "18:30"
+        first_booking_at: "19:00"
+        last_booking_at: "21:30"
+        closes_at: "23:30"
+
+  friday:
+    enabled: true
+    services:
+      lunch:
+        enabled: true
+        opens_at: "11:30"
+        first_booking_at: "12:00"
+        last_booking_at: "13:30"
+        closes_at: "15:00"
+      dinner:
+        enabled: true
+        opens_at: "18:30"
+        first_booking_at: "19:00"
+        last_booking_at: "22:00"
+        closes_at: "00:00"
+
+  saturday:
+    enabled: true
+    services:
+      lunch:
+        enabled: true
+        opens_at: "11:30"
+        first_booking_at: "12:00"
+        last_booking_at: "13:30"
+        closes_at: "15:00"
+      dinner:
+        enabled: true
+        opens_at: "18:30"
+        first_booking_at: "19:00"
+        last_booking_at: "22:00"
+        closes_at: "00:00"
+
+  sunday:
+    enabled: false
+    services: {}
+
+areas:
+  - slug: terrasse
+    name: Terrasse
+    capacity: 10
+    enabled: true
+    customer_selectable: true
+    accessible: true
+    priority: 10
+    aliases:
+      - dehors
+      - extérieur
+      - en terrasse
+
+  - slug: interieur
+    name: Intérieur
+    capacity: 20
+    enabled: true
+    customer_selectable: true
+    accessible: true
+    priority: 20
+    aliases:
+      - dedans
+      - salle
+      - en intérieur
+
+recurring_closures:
+  - name: Fête du Travail
+    recurrence_type: annual_date
+    month: 5
+    day: 1
+    all_day: true
+
+  - name: Réveillon de Noël
+    recurrence_type: annual_date
+    month: 12
+    day: 24
+    all_day: false
+    services:
+      - dinner
+
+  - name: Noël
+    recurrence_type: annual_date
+    month: 12
+    day: 25
+    all_day: true
+
+exceptional_closures: []
+tables: []
+

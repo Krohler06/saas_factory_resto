@@ -1,0 +1,36 @@
+{
+  "workflow_id": "7xWvQc8GeOTrFvEf",
+  "workflow_name": "reservation_inbound",
+  "active": false,
+  "webhook_nodes": [
+    {
+      "parameters": {
+        "path": "reservation-inbound",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "id": "Webhook",
+      "name": "Webhook Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"decision\": {{$json.decision ?? 'unknown'}},\n  \"reply\": {{$json.reply ?? 'ok'}},\n  \"missing_fields\": {{$json.missing_fields ?? []}},\n  \"special_requests\": {{$json.special_requests ?? []}}\n}"
+      },
+      "id": "RespondToWebhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3140,
+        320
+      ]
+    }
+  ]
+}

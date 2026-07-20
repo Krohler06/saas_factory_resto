@@ -1,0 +1,24 @@
+{
+  "workflow_id": "UgthKUfZdXW385HG",
+  "workflow_name": "reservation_inbound",
+  "active": true,
+  "webhook_nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reservation-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "bc1546b2-8b7f-4bc7-a9bb-8209913d2850",
+      "name": "Webhook Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        192,
+        592
+      ],
+      "webhookId": "c7b91e85-e218-44e9-9e5a-a4159fbca630"
+    }
+  ]
+}

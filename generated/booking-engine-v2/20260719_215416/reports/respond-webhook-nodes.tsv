@@ -1,0 +1,8 @@
+workflow_name	file	node_name	respond_with
+reservation_inbound	7xWvQc8GeOTrFvEf.json	Respond to Webhook	json
+reservation_multichannel_router_little_africa_v2	dYtFF0apybudqTiT.json	Respond To Retell Voice	json
+reservation_multichannel_router_little_africa_v2	dYtFF0apybudqTiT.json	Respond To Retell SMS	json
+reservation_multichannel_router_little_africa_v2	dYtFF0apybudqTiT.json	Respond To Instagram Webhook	json
+reservation_multichannel_router_little_africa_v2	dYtFF0apybudqTiT.json	Respond To Email Webhook	json
+reservation_multichannel_router_little_africa_v2	dYtFF0apybudqTiT.json	Respond To Generic Webhook	json
+Reservation AI Router v1	em0MFIptvPR24bEx.json	Respond to Webhook	json

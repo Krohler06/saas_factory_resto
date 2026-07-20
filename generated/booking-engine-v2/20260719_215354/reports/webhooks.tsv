@@ -1,0 +1,9 @@
+workflow_name	file	node_name	http_method	path	response_mode	webhook_id
+reservation_inbound	7xWvQc8GeOTrFvEf.json	Webhook Inbound	POST	reservation-inbound	responseNode	
+reservation_inbound	UgthKUfZdXW385HG.json	Webhook Inbound	POST	reservation-inbound	responseNode	c7b91e85-e218-44e9-9e5a-a4159fbca630
+reservation_multichannel_router_little_africa_v2	dYtFF0apybudqTiT.json	Webhook Retell Voice Function	POST	retell-voice-function	responseNode	dfee2ad0-a060-4ed5-8c4f-9fd9fe9b99bb
+reservation_multichannel_router_little_africa_v2	dYtFF0apybudqTiT.json	Webhook Retell SMS Function	POST	retell-sms-function	responseNode	6ba88bb0-937f-40a5-9ec6-c88cb49e0928
+reservation_multichannel_router_little_africa_v2	dYtFF0apybudqTiT.json	Webhook Email Inbound	POST	reservation-email-inbound	responseNode	ece7d420-73f4-4593-8e52-7c6080601c9f
+reservation_multichannel_router_little_africa_v2	dYtFF0apybudqTiT.json	Webhook Instagram Inbound	POST	reservation-instagram-inbound	responseNode	91a9b175-1a1e-491e-b91f-abad592c3f81
+reservation_multichannel_router_little_africa_v2	dYtFF0apybudqTiT.json	Webhook Generic Inbound	POST	reservation-generic-inbound	responseNode	9a3afaf3-f848-43ed-a4e8-2abbff46eeba
+Reservation AI Router v1	em0MFIptvPR24bEx.json	Webhook Inbound	POST	reservation-inbound	responseNode	9309696a-38c9-4805-9267-6a16fa01a675

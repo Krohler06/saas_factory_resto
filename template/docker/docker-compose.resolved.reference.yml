@@ -7,7 +7,7 @@ services:
         condition: service_started
         required: true
     environment:
-      BASE_DOMAIN: cyber-saas-private.ddnsfree.com
+      BASE_DOMAIN: __BASE_DOMAIN__
       CLIENT_ID: little_africa_nice
       DB_POSTGRESDB_DATABASE: booking_shared_little_africa
       DB_POSTGRESDB_HOST: little_africa_nice_postgres
@@ -22,9 +22,9 @@ services:
       N8N_BASIC_AUTH_USER: admin
       N8N_DIAGNOSTICS_ENABLED: "false"
       N8N_DISABLE_UI: "false"
-      N8N_EDITOR_BASE_URL: https://cyber-saas-private.ddnsfree.com/little_africa_nice/
+      N8N_EDITOR_BASE_URL: https://__BASE_DOMAIN__/little_africa_nice/
       N8N_ENCRYPTION_KEY: ChangeMeEncryptionKey1234567890abcdef
-      N8N_HOST: cyber-saas-private.ddnsfree.com
+      N8N_HOST: __BASE_DOMAIN__
       N8N_LOG_LEVEL: debug
       N8N_PATH: /little_africa_nice/
       N8N_PORT: "5678"
@@ -41,7 +41,7 @@ services:
       TELEGRAM_BOT_TOKEN: CHANGE_ME_TELEGRAM_BOT_TOKEN
       TELEGRAM_BOT_USERNAME: CHANGE_ME_BOT_USERNAME
       TLS_EMAIL: jeremy.lemaire1503@gmail.com
-      WEBHOOK_URL: https://cyber-saas-private.ddnsfree.com/little_africa_nice/
+      WEBHOOK_URL: https://__BASE_DOMAIN__/little_africa_nice/
     image: n8nio/n8n:latest
     networks:
       saas_net: null
