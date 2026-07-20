@@ -1,9 +1,23 @@
 # Managed by saas_factory for @@CLIENT_ID@@
-# Ce snippet doit être importé depuis le bloc du domaine partagé.
+# Imported from the shared domain site block.
 
 redir /@@TENANT_PATH@@ /@@TENANT_PATH@@/ 308
 
-handle /@@TENANT_PATH@@/* {
+# Webhooks de production publics.
+#
+# L'URL externe contient le préfixe du tenant :
+#   /@@TENANT_PATH@@/webhook/...
+#
+# n8n reçoit :
+#   /webhook/...
+handle /@@TENANT_PATH@@/webhook/* {
+    uri strip_prefix /@@TENANT_PATH@@
     reverse_proxy @@N8N_CONTAINER@@:5678
 }
 
+# Interface n8n protégée.
+# Le préfixe est conservé car N8N_PATH=/@@TENANT_PATH@@/.
+handle /@@TENANT_PATH@@/* {
+    import ionos_auth
+    reverse_proxy @@N8N_CONTAINER@@:5678
+}

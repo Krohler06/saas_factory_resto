@@ -120,7 +120,7 @@ done
 [[ -f "$FACTORY_FILE" ]] ||
   fatal "Factory absente : $FACTORY_FILE"
 
-for command in docker python3 rsync curl tar; do
+for command in docker python3 rsync curl tar sha256sum; do
   command -v "$command" >/dev/null 2>&1 ||
     fatal "Commande absente : $command"
 done
@@ -296,11 +296,7 @@ set -a
 source .env
 set +a
 
-info "Application des migrations et seeds"
-
-while IFS= read -r sql_file; do
-  info "SQL : $(basename "$sql_file")"
-
+db_psql() {
   docker compose \
     --env-file .env \
     -f docker-compose.yml \
@@ -311,13 +307,82 @@ while IFS= read -r sql_file; do
     -v ON_ERROR_STOP=1 \
     -U "$POSTGRES_USER" \
     -d "$POSTGRES_DB" \
-    < "$sql_file"
+    "$@"
+}
+
+info "Préparation du registre des migrations"
+
+db_psql <<'SQL_MIGRATION_TABLE'
+CREATE TABLE IF NOT EXISTS saas_schema_migrations (
+    filename TEXT PRIMARY KEY,
+    checksum TEXT NOT NULL,
+    applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+SQL_MIGRATION_TABLE
+
+info "Application des migrations et seeds"
+
+while IFS= read -r sql_file; do
+  filename="$(basename "$sql_file")"
+  checksum="$(sha256sum "$sql_file" | awk '{print $1}')"
+
+  case "$filename" in
+    *-tenant-bootstrap.sql|*-seed.sql)
+      info "SQL répétable : $filename"
+
+      db_psql < "$sql_file"
+      ;;
+
+    *)
+      applied_checksum="$(
+        printf '%s\n' \
+          "SELECT checksum" \
+          "FROM saas_schema_migrations" \
+          "WHERE filename = :'migration_filename';" |
+        db_psql \
+          -At \
+          -v "migration_filename=$filename"
+      )"
+
+      if [[ -n "$applied_checksum" ]]; then
+        if [[ "$applied_checksum" == "$checksum" ]]; then
+          ok "Migration déjà appliquée : $filename"
+          continue
+        fi
+
+        fatal \
+          "La migration $filename existe avec un autre checksum. Ne pas modifier une migration déjà appliquée : créer un nouveau fichier SQL."
+      fi
+
+      info "Nouvelle migration : $filename"
+
+      db_psql < "$sql_file"
+
+      printf '%s\n' \
+        "INSERT INTO saas_schema_migrations (" \
+        "    filename," \
+        "    checksum," \
+        "    applied_at" \
+        ")" \
+        "VALUES (" \
+        "    :'migration_filename'," \
+        "    :'migration_checksum'," \
+        "    NOW()" \
+        ");" |
+      db_psql \
+        -v "migration_filename=$filename" \
+        -v "migration_checksum=$checksum"
+
+      ok "Migration enregistrée : $filename"
+      ;;
+  esac
 done < <(
   find "$TARGET_DIR/sql" \
     -maxdepth 1 \
     -type f \
     -name '*.sql' \
-    | sort
+    -print |
+  sort
 )
 
 info "Démarrage de n8n"

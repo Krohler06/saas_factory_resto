@@ -89,11 +89,13 @@ for command in python3 sha256sum docker; do
 done
 
 VALIDATOR="$FACTORY_DIR/scripts/validate-tenant.py"
+BOOTSTRAP_GENERATOR="$FACTORY_DIR/scripts/generate-tenant-bootstrap.py"
 SEED_GENERATOR="$FACTORY_DIR/scripts/generate-booking-v2-seed.py"
 RENDERER="$FACTORY_DIR/scripts/render-tenant-infrastructure.py"
 GENERATED_VALIDATOR="$FACTORY_DIR/scripts/validate-generated-tenant.sh"
 
 [[ -x "$VALIDATOR" ]] || fatal "Validateur absent : $VALIDATOR"
+[[ -x "$BOOTSTRAP_GENERATOR" ]] || fatal "Générateur bootstrap absent : $BOOTSTRAP_GENERATOR"
 [[ -x "$SEED_GENERATOR" ]] || fatal "Générateur SQL absent : $SEED_GENERATOR"
 [[ -x "$RENDERER" ]] || fatal "Renderer absent : $RENDERER"
 [[ -x "$GENERATED_VALIDATOR" ]] ||
@@ -132,6 +134,10 @@ if [[ "$ROTATE_SECRETS" == true ]]; then
 fi
 
 "$RENDERER" "${RENDER_ARGS[@]}"
+
+"$BOOTSTRAP_GENERATOR" \
+  "$TENANT_FILE" \
+  "$OUTPUT_DIR/sql/005-tenant-bootstrap.sql"
 
 "$SEED_GENERATOR" \
   "$TENANT_FILE" \

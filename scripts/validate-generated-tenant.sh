@@ -90,5 +90,33 @@ permissions="$(stat -c '%a' "$GENERATED_DIR/.env")"
 [[ "$permissions" == "600" ]] ||
   fatal ".env doit être en 600, valeur actuelle : $permissions"
 
+mapfile -t duplicate_sql_versions < <(
+  find "$GENERATED_DIR/sql" \
+    -maxdepth 1 \
+    -type f \
+    -name '[0-9][0-9][0-9]*.sql' \
+    -printf '%f\n' |
+  sed -E 's/^([0-9]{3}).*/\1/' |
+  sort |
+  uniq -d
+)
+
+if [[ "${#duplicate_sql_versions[@]}" -gt 0 ]]; then
+  printf '[ERREUR] Numéros SQL dupliqués :\n' >&2
+  printf '  - %s\n' "${duplicate_sql_versions[@]}" >&2
+
+  printf '\nFichiers concernés :\n' >&2
+
+  for version in "${duplicate_sql_versions[@]}"; do
+    find "$GENERATED_DIR/sql" \
+      -maxdepth 1 \
+      -type f \
+      -name "${version}*.sql" \
+      -printf '  - %f\n' >&2
+  done
+
+  fatal "Chaque fichier SQL doit avoir un numéro unique."
+fi
+
 printf '[OK] Rendu valide : %s\n' "$GENERATED_DIR"
 
