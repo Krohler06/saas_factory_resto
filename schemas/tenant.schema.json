@@ -1,0 +1,539 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/tenant.schema.json",
+  "title": "Restaurant SaaS tenant configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "tenant",
+    "restaurant",
+    "booking_engine",
+    "service_definitions",
+    "weekly_schedule",
+    "areas",
+    "recurring_closures",
+    "exceptional_closures",
+    "tables"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "tenant": {
+      "$ref": "#/$defs/tenant"
+    },
+    "restaurant": {
+      "$ref": "#/$defs/restaurant"
+    },
+    "booking_engine": {
+      "$ref": "#/$defs/bookingEngine"
+    },
+    "service_definitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/serviceDefinition"
+      }
+    },
+    "weekly_schedule": {
+      "$ref": "#/$defs/weeklySchedule"
+    },
+    "areas": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/area"
+      }
+    },
+    "recurring_closures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/recurringClosure"
+      }
+    },
+    "exceptional_closures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/exceptionalClosure"
+      }
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/table"
+      }
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[a-z0-9][a-z0-9_-]*$"
+    },
+    "time": {
+      "type": "string",
+      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+    },
+    "tenant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "client_id",
+        "restaurant_slug"
+      ],
+      "properties": {
+        "client_id": {
+          "$ref": "#/$defs/slug"
+        },
+        "restaurant_slug": {
+          "$ref": "#/$defs/slug"
+        },
+        "restaurant_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "restaurant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timezone",
+        "active"
+      ],
+      "properties": {
+        "timezone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "active": {
+          "type": "boolean"
+        }
+      }
+    },
+    "bookingEngine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allocation_mode",
+        "minimum_advance_minutes",
+        "maximum_advance_days",
+        "max_party_size",
+        "default_slot_interval_minutes",
+        "default_cleaning_buffer_minutes",
+        "allow_table_combinations",
+        "maximum_combined_tables",
+        "recurring_closure_years"
+      ],
+      "properties": {
+        "allocation_mode": {
+          "enum": [
+            "global_capacity",
+            "area_capacity",
+            "table_assignment"
+          ]
+        },
+        "minimum_advance_minutes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10080
+        },
+        "maximum_advance_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 730
+        },
+        "max_party_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        },
+        "default_slot_interval_minutes": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 240
+        },
+        "default_cleaning_buffer_minutes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 240
+        },
+        "allow_table_combinations": {
+          "type": "boolean"
+        },
+        "maximum_combined_tables": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "recurring_closure_years": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        }
+      }
+    },
+    "serviceDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "name",
+        "default_duration_minutes",
+        "slot_interval_minutes",
+        "priority"
+      ],
+      "properties": {
+        "slug": {
+          "$ref": "#/$defs/slug"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "default_duration_minutes": {
+          "type": "integer",
+          "minimum": 15,
+          "maximum": 1440
+        },
+        "slot_interval_minutes": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 240
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "serviceHours": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "opens_at": {
+          "$ref": "#/$defs/time"
+        },
+        "first_booking_at": {
+          "$ref": "#/$defs/time"
+        },
+        "last_booking_at": {
+          "$ref": "#/$defs/time"
+        },
+        "closes_at": {
+          "$ref": "#/$defs/time"
+        },
+        "capacity_override": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "enabled": {
+                "const": true
+              }
+            },
+            "required": [
+              "enabled"
+            ]
+          },
+          "then": {
+            "required": [
+              "opens_at",
+              "first_booking_at",
+              "last_booking_at",
+              "closes_at"
+            ]
+          }
+        }
+      ]
+    },
+    "daySchedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "services"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "services": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/serviceHours"
+          }
+        }
+      }
+    },
+    "weeklySchedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+      ],
+      "properties": {
+        "monday": {
+          "$ref": "#/$defs/daySchedule"
+        },
+        "tuesday": {
+          "$ref": "#/$defs/daySchedule"
+        },
+        "wednesday": {
+          "$ref": "#/$defs/daySchedule"
+        },
+        "thursday": {
+          "$ref": "#/$defs/daySchedule"
+        },
+        "friday": {
+          "$ref": "#/$defs/daySchedule"
+        },
+        "saturday": {
+          "$ref": "#/$defs/daySchedule"
+        },
+        "sunday": {
+          "$ref": "#/$defs/daySchedule"
+        }
+      }
+    },
+    "area": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "name",
+        "capacity",
+        "priority",
+        "enabled",
+        "customer_selectable",
+        "accessible",
+        "aliases"
+      ],
+      "properties": {
+        "slug": {
+          "$ref": "#/$defs/slug"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "capacity": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "customer_selectable": {
+          "type": "boolean"
+        },
+        "accessible": {
+          "type": "boolean"
+        },
+        "floor_label": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 80
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      }
+    },
+    "recurringClosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "name",
+        "recurrence_type",
+        "month",
+        "day",
+        "all_day"
+      ],
+      "properties": {
+        "slug": {
+          "$ref": "#/$defs/slug"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "recurrence_type": {
+          "const": "annual_date"
+        },
+        "month": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "day": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31
+        },
+        "all_day": {
+          "type": "boolean"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          }
+        },
+        "areas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          }
+        }
+      }
+    },
+    "exceptionalClosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "name",
+        "starts_at",
+        "ends_at",
+        "all_day"
+      ],
+      "properties": {
+        "slug": {
+          "$ref": "#/$defs/slug"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "starts_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ends_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "all_day": {
+          "type": "boolean"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          }
+        },
+        "areas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          }
+        }
+      }
+    },
+    "table": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "area",
+        "min_capacity",
+        "max_capacity",
+        "priority",
+        "enabled",
+        "is_combinable"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 120
+        },
+        "area": {
+          "$ref": "#/$defs/slug"
+        },
+        "min_capacity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "max_capacity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "is_combinable": {
+          "type": "boolean"
+        },
+        "combination_group": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 80
+        }
+      }
+    }
+  }
+}
+
