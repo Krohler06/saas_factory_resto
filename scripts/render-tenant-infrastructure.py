@@ -125,6 +125,25 @@ def render_json_templates(
     return rendered_files
 
 
+
+def set_import_permissions(output_dir: Path) -> None:
+    credentials_dir = output_dir / "n8n" / "credentials"
+    workflows_dir = output_dir / "n8n" / "workflows"
+
+    if credentials_dir.is_dir():
+        os.chmod(credentials_dir, 0o750)
+
+        for credential in credentials_dir.glob("*.json"):
+            os.chmod(credential, 0o640)
+
+    if workflows_dir.is_dir():
+        os.chmod(workflows_dir, 0o755)
+
+        for workflow in workflows_dir.glob("*.json"):
+            os.chmod(workflow, 0o644)
+
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Génère Docker, Caddy et les secrets d'un tenant."
@@ -241,6 +260,7 @@ def main() -> int:
             "N8N_CONTAINER": n8n_container,
             "POSTGRES_DB": postgres_db,
             "POSTGRES_USER": postgres_user,
+            "POSTGRES_PASSWORD": postgres_password,
             "POSTGRES_IMAGE": postgres_image,
             "N8N_IMAGE": n8n_image,
             "N8N_LOG_LEVEL": n8n_log_level,
@@ -254,6 +274,12 @@ def main() -> int:
             ).rstrip()
             + "\n",
             encoding="utf-8",
+        )
+
+        credential_files = render_json_templates(
+            args.template_root / "n8n" / "credentials",
+            args.output_dir / "n8n" / "credentials",
+            tokens,
         )
 
         workflow_files = render_json_templates(
@@ -272,6 +298,8 @@ def main() -> int:
         )
         (args.output_dir / "sql").mkdir(parents=True, exist_ok=True)
         (args.output_dir / "meta").mkdir(parents=True, exist_ok=True)
+
+        set_import_permissions(args.output_dir)
 
         migration_files: list[str] = []
         migration_dir = args.template_root / "sql" / "migrations"
@@ -329,6 +357,7 @@ def main() -> int:
             },
             "files": {
                 "migrations": migration_files,
+                "credentials": credential_files,
                 "workflows": workflow_files,
                 "retell": retell_files,
             },

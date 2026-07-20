@@ -394,6 +394,95 @@ docker compose \
 
 wait_for_health "${CLIENT_ID}_n8n" "$WAIT_TIMEOUT"
 
+
+info "Correction des permissions des imports n8n"
+
+N8N_RUNTIME_UID="$(
+  docker compose \
+    --env-file .env \
+    -f docker-compose.yml \
+    exec -T n8n \
+    id -u
+)"
+
+N8N_RUNTIME_GID="$(
+  docker compose \
+    --env-file .env \
+    -f docker-compose.yml \
+    exec -T n8n \
+    id -g
+)"
+
+[[ "$N8N_RUNTIME_UID" =~ ^[0-9]+$ ]] ||
+  fatal "UID n8n invalide : $N8N_RUNTIME_UID"
+
+[[ "$N8N_RUNTIME_GID" =~ ^[0-9]+$ ]] ||
+  fatal "GID n8n invalide : $N8N_RUNTIME_GID"
+
+mkdir -p \
+  "$TARGET_DIR/n8n/credentials" \
+  "$TARGET_DIR/n8n/workflows"
+
+chown -R \
+  "$N8N_RUNTIME_UID:$N8N_RUNTIME_GID" \
+  "$TARGET_DIR/n8n/credentials"
+
+find "$TARGET_DIR/n8n/credentials" \
+  -type d \
+  -exec chmod 0750 {} \;
+
+find "$TARGET_DIR/n8n/credentials" \
+  -type f \
+  -name '*.json' \
+  -exec chmod 0640 {} \;
+
+# Les workflows ne contiennent normalement pas de secrets.
+# Ils doivent seulement être lisibles par le processus n8n.
+find "$TARGET_DIR/n8n/workflows" \
+  -type d \
+  -exec chmod 0755 {} \;
+
+find "$TARGET_DIR/n8n/workflows" \
+  -type f \
+  -name '*.json' \
+  -exec chmod 0644 {} \;
+
+docker compose \
+  --env-file .env \
+  -f docker-compose.yml \
+  exec -T n8n \
+  sh -c '
+    test -x /import/credentials ||
+      {
+        echo "Dossier /import/credentials inaccessible" >&2
+        exit 1
+      }
+
+    for file in /import/credentials/*.json; do
+      [ -e "$file" ] || continue
+
+      test -r "$file" ||
+        {
+          echo "Credential illisible : $file" >&2
+          exit 1
+        }
+    done
+  '
+
+ok "Permissions des imports n8n validées"
+
+credential_count="$(
+  find "$TARGET_DIR/n8n/credentials"     -maxdepth 1     -type f     -name '*.json'     2>/dev/null     | wc -l
+)"
+
+if [[ "$SKIP_WORKFLOWS" != true       && "$IMPORT_WORKFLOWS" == true       && "$credential_count" -gt 0 ]]; then
+  info "Import de $credential_count credential(s) n8n"
+
+  docker compose     --env-file .env     -f docker-compose.yml     exec -T n8n     n8n import:credentials     --separate     --input=/import/credentials
+else
+  warn "Aucun credential n8n importé."
+fi
+
 workflow_count="$(
   find "$TARGET_DIR/n8n/workflows" \
     -maxdepth 1 \
