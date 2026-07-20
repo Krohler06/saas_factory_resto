@@ -8,8 +8,8 @@ factory:
   create_edge_network: false
 
   # Épingler une version précise avant la production.
-  n8n_image: docker.n8n.io/n8nio/n8n:latest
-  postgres_image: postgres:16
+  n8n_image: docker.n8n.io/n8nio/n8n:2.26.8
+  postgres_image: postgres:16.14
   n8n_log_level: info
 
   caddy:
