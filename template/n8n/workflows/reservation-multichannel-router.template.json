@@ -1,0 +1,909 @@
+{
+  "id": "SaasMultiChanV2a",
+  "name": "reservation_multichannel_router_@@CLIENT_ID@@_v2",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "retell-voice-function",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f8647c9a-f89a-4943-b5b7-d0b0555ca671",
+      "name": "Webhook Retell Voice Function",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        432
+      ],
+      "webhookId": "610dfd07-81cd-5706-a33e-048e8e1f4b9d"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "retell-sms-function",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "0eb8d5a9-c119-413e-ac0a-50aa51f2d250",
+      "name": "Webhook Retell SMS Function",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        640
+      ],
+      "webhookId": "1db9279f-de10-50c6-b865-34e441303b10"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reservation-email-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e7d59c8c-ff20-4279-8db8-859f80ef3a39",
+      "name": "Webhook Email Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        864
+      ],
+      "webhookId": "5b198161-093a-56c1-aea3-3d94ec18724d"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reservation-instagram-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b4f4068f-2c5a-4d67-a21e-6fd0d2addaf6",
+      "name": "Webhook Instagram Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        1088
+      ],
+      "webhookId": "a8820b45-8c47-5b17-8133-f4963b7e5d40"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reservation-generic-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "38a3edfe-7260-47a9-b0f4-dff2cbc640e6",
+      "name": "Webhook Generic Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        1312
+      ],
+      "webhookId": "40aa5b14-55b9-56ea-85cd-851301c36652"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    __inbound_source: 'retell_voice',\n    __inbound_channel: 'phone',\n    __provider: 'retell',\n    __expected_return: 'webhook',\n    __received_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "4da67409-3d96-41ac-816d-dab06ebeab21",
+      "name": "Mark Retell Voice Source",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    __inbound_source: 'retell_sms',\n    __inbound_channel: 'sms',\n    __provider: 'retell',\n    __expected_return: 'webhook',\n    __received_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "a069cf1c-0ef3-4df0-a06a-7ffe9c35b050",
+      "name": "Mark Retell SMS Source",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    __inbound_source: 'email',\n    __inbound_channel: 'email',\n    __provider: 'mail_provider',\n    __expected_return: 'webhook',\n    __received_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "ad8e5574-da67-43db-8acf-b564f276cbbc",
+      "name": "Mark Email Source",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    __inbound_source: 'instagram',\n    __inbound_channel: 'instagram',\n    __provider: 'meta',\n    __expected_return: 'webhook',\n    __received_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "352efbf0-b792-483a-bfdc-fa4a0b6699a4",
+      "name": "Mark Instagram Source",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    __inbound_source: 'webhook',\n    __inbound_channel: 'webhook',\n    __provider: 'generic',\n    __expected_return: 'webhook',\n    __received_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "af7bd84d-3f33-4f68-a7af-5534691a2813",
+      "name": "Mark Generic Source",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        1312
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rootEnvelope = $json.body ?? $json;\nconst headers = $json.headers ?? rootEnvelope.headers ?? {};\nconst lowerHeaders = Object.fromEntries(Object.entries(headers).map(([k, v]) => [String(k).toLowerCase(), v]));\n\nconst inboundSource = $json.__inbound_source ?? rootEnvelope.__inbound_source ?? null;\nconst inboundChannel = $json.__inbound_channel ?? rootEnvelope.__inbound_channel ?? null;\nconst provider = $json.__provider ?? rootEnvelope.__provider ?? null;\nconst expectedReturn = $json.__expected_return ?? rootEnvelope.__expected_return ?? 'webhook';\n\nconst args =\n  rootEnvelope.args ??\n  rootEnvelope.arguments ??\n  rootEnvelope.input ??\n  rootEnvelope.parameters ??\n  rootEnvelope.data ??\n  rootEnvelope.message ??\n  rootEnvelope;\n\nfunction clean(v) {\n  return v === undefined || v === null || v === '' || v === 'null' ? null : v;\n}\n\nfunction asString(v) {\n  return v === undefined || v === null ? null : String(v);\n}\n\nfunction normalizeAction(value) {\n  const raw = String(value ?? '').trim().toLowerCase();\n  const aliases = {\n    'restaurant_context': 'get_restaurant_context',\n    'get_context': 'get_restaurant_context',\n    'context': 'get_restaurant_context',\n    'availability': 'check_availability',\n    'check_slot': 'check_availability',\n    'check': 'check_availability',\n    'reserve': 'create_reservation',\n    'book': 'create_reservation',\n    'confirm_reservation': 'create_reservation',\n    'create_booking': 'create_reservation',\n    'log': 'log_conversation',\n    'call_log': 'log_conversation',\n    'message': 'message_inbound',\n    'inbound': 'message_inbound',\n    'incoming_message': 'message_inbound'\n  };\n  return aliases[raw] ?? raw;\n}\n\nfunction sqlString(value) {\n  if (value === null || value === undefined || value === '') return 'NULL';\n  return `'${String(value).replace(/'/g, \"''\")}'`;\n}\n\nfunction sqlNumber(value) {\n  if (value === null || value === undefined || value === '' || Number.isNaN(Number(value))) return 'NULL';\n  return String(Number(value));\n}\n\nfunction sqlBoolean(value) {\n  return value === true || value === 'true' || value === 1 || value === '1' ? 'TRUE' : 'FALSE';\n}\n\nfunction sqlJson(value) {\n  if (value === null || value === undefined) return 'NULL';\n  return `'${JSON.stringify(value).replace(/'/g, \"''\")}'::jsonb`;\n}\n\nconst functionAction = normalizeAction(\n  clean(rootEnvelope.function_name) ??\n  clean(rootEnvelope.name) ??\n  clean(rootEnvelope.action) ??\n  clean(args.function_name) ??\n  clean(args.name) ??\n  clean(args.action)\n);\n\nconst source =\n  clean(args.source) ??\n  clean(rootEnvelope.source) ??\n  clean(inboundSource) ??\n  'webhook';\n\nconst channel =\n  clean(args.channel) ??\n  clean(rootEnvelope.channel) ??\n  clean(inboundChannel) ??\n  (source === 'retell_voice' ? 'phone' : source === 'retell_sms' ? 'sms' : source === 'email' ? 'email' : source === 'instagram' ? 'instagram' : 'webhook');\n\nconst action = functionAction || (\n  source === 'retell_voice' || source === 'retell_sms'\n    ? 'get_restaurant_context'\n    : 'message_inbound'\n);\n\nconst callId =\n  clean(rootEnvelope.call_id) ??\n  clean(rootEnvelope.call?.call_id) ??\n  clean(args.call_id) ??\n  clean(args.call?.call_id);\n\nconst smsId =\n  clean(rootEnvelope.sms_id) ??\n  clean(rootEnvelope.message_id) ??\n  clean(rootEnvelope.sms?.id) ??\n  clean(args.sms_id) ??\n  clean(args.message_id) ??\n  clean(args.sms?.id);\n\nconst emailMessageId =\n  clean(rootEnvelope.email_message_id) ??\n  clean(rootEnvelope.mail?.message_id) ??\n  clean(args.email_message_id) ??\n  clean(args.message_id);\n\nconst instagramMessageId =\n  clean(rootEnvelope.instagram_message_id) ??\n  clean(rootEnvelope.entry?.[0]?.messaging?.[0]?.message?.mid) ??\n  clean(args.instagram_message_id) ??\n  clean(args.message_id);\n\nconst from =\n  clean(args.from) ??\n  clean(args.caller) ??\n  clean(args.phone) ??\n  clean(rootEnvelope.from) ??\n  clean(rootEnvelope.call?.from_number) ??\n  clean(rootEnvelope.call?.from) ??\n  clean(rootEnvelope.sms?.from) ??\n  clean(rootEnvelope.mail?.from) ??\n  clean(rootEnvelope.entry?.[0]?.messaging?.[0]?.sender?.id);\n\nconst to =\n  clean(args.to) ??\n  clean(rootEnvelope.to) ??\n  clean(rootEnvelope.call?.to_number) ??\n  clean(rootEnvelope.call?.to) ??\n  clean(rootEnvelope.sms?.to) ??\n  clean(rootEnvelope.mail?.to) ??\n  clean(rootEnvelope.entry?.[0]?.messaging?.[0]?.recipient?.id);\n\nconst phone =\n  clean(args.phone) ??\n  clean(args.caller_phone) ??\n  (channel === 'phone' || channel === 'sms' ? clean(from) : null);\n\nconst email =\n  clean(args.email) ??\n  clean(args.customer_email) ??\n  clean(rootEnvelope.email) ??\n  clean(rootEnvelope.mail?.from);\n\nconst restaurantSlug =\n  clean(args.restaurant_slug) ??\n  clean(args.slug) ??\n  clean(rootEnvelope.restaurant_slug) ??\n  clean(rootEnvelope.slug) ??\n  clean(rootEnvelope.metadata?.restaurant_slug) ??\n  clean(args.metadata?.restaurant_slug);\n\nconst conversationId =\n  clean(args.conversation_id) ??\n  clean(rootEnvelope.conversation_id) ??\n  (callId ? `retell-call-${callId}` : null) ??\n  (smsId ? `retell-sms-${smsId}` : null) ??\n  (emailMessageId ? `email-${emailMessageId}` : null) ??\n  (instagramMessageId ? `instagram-${instagramMessageId}` : null) ??\n  (from ? `${source}-${from}` : null) ??\n  `${source}-${Date.now()}`;\n\nconst userMessage =\n  clean(args.user_message) ??\n  clean(args.message) ??\n  clean(args.text) ??\n  clean(args.transcript) ??\n  clean(rootEnvelope.user_message) ??\n  clean(rootEnvelope.message?.text) ??\n  clean(rootEnvelope.message) ??\n  clean(rootEnvelope.text) ??\n  clean(rootEnvelope.sms?.text) ??\n  clean(rootEnvelope.mail?.text) ??\n  clean(rootEnvelope.mail?.subject) ??\n  clean(rootEnvelope.entry?.[0]?.messaging?.[0]?.message?.text) ??\n  '';\n\nconst requestedDatetime =\n  clean(args.requested_datetime) ??\n  clean(args.start_time) ??\n  clean(args.datetime) ??\n  clean(rootEnvelope.requested_datetime);\n\nconst partySize =\n  clean(args.party_size) ??\n  clean(args.people) ??\n  clean(args.guests) ??\n  clean(rootEnvelope.party_size);\n\nconst fullName =\n  clean(args.full_name) ??\n  clean(args.name_for_reservation) ??\n  clean(args.customer_name) ??\n  clean(rootEnvelope.full_name) ??\n  clean(rootEnvelope.mail?.from_name);\n\nconst specialRequest =\n  clean(args.special_request) ??\n  clean(args.special_requests) ??\n  clean(args.note) ??\n  clean(rootEnvelope.special_request);\n\nconst customerConfirmed =\n  args.customer_confirmed ??\n  args.confirmed ??\n  rootEnvelope.customer_confirmed ??\n  false;\n\nconst summary =\n  clean(args.summary) ??\n  clean(rootEnvelope.summary) ??\n  clean(rootEnvelope.call?.call_analysis?.call_summary);\n\nconst transcript =\n  clean(args.transcript) ??\n  clean(rootEnvelope.transcript) ??\n  clean(rootEnvelope.call?.transcript);\n\nconst externalEventId =\n  clean(args.external_event_id) ??\n  clean(rootEnvelope.external_event_id) ??\n  clean(rootEnvelope.event_id) ??\n  clean(callId) ??\n  clean(smsId) ??\n  clean(emailMessageId) ??\n  clean(instagramMessageId) ??\n  conversationId;\n\nconst retellSignature = clean(lowerHeaders['x-retell-signature']);\n\nconst allowedSources = ['retell_voice', 'retell_sms', 'email', 'instagram', 'webhook'];\n\nreturn [{\n  json: {\n    action,\n    source,\n    channel,\n    provider,\n    expected_return: expectedReturn,\n    inbound_source: inboundSource,\n    inbound_channel: inboundChannel,\n    source_allowed: allowedSources.includes(source),\n    source_matches_entrypoint: source === inboundSource,\n    retell_signature_present: !!retellSignature,\n    retell_signature_status: retellSignature ? 'present_not_cryptographically_verified_in_blueprint' : 'missing',\n    source_verification_status:\n      source.startsWith('retell')\n        ? (source === inboundSource && provider === 'retell' && retellSignature ? 'soft_verified_signature_present' : 'retell_unverified_signature_missing_or_source_mismatch')\n        : (source === inboundSource ? 'soft_verified_by_entrypoint' : 'source_mismatch'),\n\n    conversation_id: conversationId,\n    external_event_id: externalEventId,\n    call_id: callId,\n    sms_id: smsId,\n    email_message_id: emailMessageId,\n    instagram_message_id: instagramMessageId,\n\n    restaurant_slug: restaurantSlug,\n    to,\n    from,\n    phone,\n    email,\n    full_name: fullName,\n    user_message: userMessage,\n    raw_message: userMessage,\n    requested_datetime: requestedDatetime,\n    party_size: partySize === null ? null : Number(partySize),\n    special_request: specialRequest,\n    customer_confirmed: customerConfirmed === true || customerConfirmed === 'true' || customerConfirmed === 1 || customerConfirmed === '1',\n    summary,\n    transcript,\n\n    action_sql: sqlString(action),\n    source_sql: sqlString(source),\n    channel_sql: sqlString(channel),\n    provider_sql: sqlString(provider),\n    conversation_id_sql: sqlString(conversationId),\n    external_event_id_sql: sqlString(externalEventId),\n    call_id_sql: sqlString(callId),\n    sms_id_sql: sqlString(smsId),\n    email_message_id_sql: sqlString(emailMessageId),\n    instagram_message_id_sql: sqlString(instagramMessageId),\n    restaurant_slug_sql: sqlString(restaurantSlug),\n    to_sql: sqlString(to),\n    from_sql: sqlString(from),\n    phone_sql: sqlString(phone),\n    email_sql: sqlString(email),\n    full_name_sql: sqlString(fullName),\n    user_message_sql: sqlString(userMessage),\n    requested_datetime_sql: sqlString(requestedDatetime),\n    party_size_sql: sqlNumber(partySize),\n    special_request_sql: sqlString(specialRequest),\n    customer_confirmed_sql: sqlBoolean(customerConfirmed),\n    summary_sql: sqlString(summary),\n    transcript_sql: sqlString(transcript),\n    raw_payload_sql: sqlJson(rootEnvelope),\n\n    raw_payload: rootEnvelope,\n    headers\n  }\n}];"
+      },
+      "id": "1b0e2f60-d88c-4f90-b8a6-1167cf44bba8",
+      "name": "Normalize Channel Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\nconst isRetell = ['retell_voice', 'retell_sms'].includes(input.source);\nconst hardReject = false;\n\nlet warnings = [];\nif (!input.source_allowed) warnings.push('SOURCE_NOT_ALLOWED');\nif (!input.source_matches_entrypoint) warnings.push('SOURCE_ENTRYPOINT_MISMATCH');\nif (isRetell && !input.retell_signature_present) warnings.push('RETELL_SIGNATURE_MISSING');\n\nreturn [{\n  json: {\n    ...input,\n    is_retell_source: isRetell,\n    source_warnings: warnings,\n    source_verified_for_test: input.source_allowed && input.source_matches_entrypoint,\n    source_verified_cryptographically: false,\n    reject_request: hardReject && warnings.length > 0\n  }\n}];"
+      },
+      "id": "4badd82d-356c-4464-a701-feb0beb1199e",
+      "name": "Verify Channel Source",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH input AS (\n    SELECT\n        {{ $('Verify Channel Source').item.json.restaurant_slug_sql }}::text\n            AS requested_slug\n)\nSELECT\n    r.id AS restaurant_id,\n    r.slug,\n    r.name,\n    r.timezone,\n    s.default_meal_duration_minutes,\n    s.cleaning_buffer_minutes,\n    s.grace_delay_minutes,\n    s.max_party_size,\n    s.allow_combined_tables,\n    s.reminder_days_before,\n    s.reminder_hour,\n    s.reminder_channel,\n    s.booking_policy,\n    s.event_notification_policy\nFROM restaurants r\nJOIN restaurant_settings s\n    ON s.restaurant_id = r.id\nCROSS JOIN input i\nWHERE r.is_active = TRUE\n  AND (\n      i.requested_slug IS NULL\n      OR r.slug = i.requested_slug\n  )\nORDER BY\n    CASE\n        WHEN i.requested_slug IS NOT NULL\n         AND r.slug = i.requested_slug\n        THEN 0\n        ELSE 1\n    END,\n    r.id\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "c302941d-2535-437b-beca-dcd642f88ed3",
+      "name": "Lookup Restaurant Context",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        864
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SaasPgBusinessV2",
+          "name": "Postgres @@CLIENT_ID@@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  EXISTS (\n    SELECT 1\n    FROM restaurant_closures\n    WHERE restaurant_id = {{ $('Lookup Restaurant Context').item.json.restaurant_id || 'NULL' }}\n      AND is_active = true\n      AND {{ $('Verify Channel Source').item.json.requested_datetime_sql }} IS NOT NULL\n      AND starts_at <= {{ $('Verify Channel Source').item.json.requested_datetime_sql }}::timestamptz\n      AND ends_at > {{ $('Verify Channel Source').item.json.requested_datetime_sql }}::timestamptz\n  ) AS is_closed,\n  (\n    SELECT reason\n    FROM restaurant_closures\n    WHERE restaurant_id = {{ $('Lookup Restaurant Context').item.json.restaurant_id || 'NULL' }}\n      AND is_active = true\n      AND {{ $('Verify Channel Source').item.json.requested_datetime_sql }} IS NOT NULL\n      AND starts_at <= {{ $('Verify Channel Source').item.json.requested_datetime_sql }}::timestamptz\n      AND ends_at > {{ $('Verify Channel Source').item.json.requested_datetime_sql }}::timestamptz\n    ORDER BY starts_at DESC\n    LIMIT 1\n  ) AS closure_reason;",
+        "options": {}
+      },
+      "id": "e0a3e0b5-8048-40f7-adba-fafb6efa2c2d",
+      "name": "Check Closure For Request",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        864
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SaasPgBusinessV2",
+          "name": "Postgres @@CLIENT_ID@@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH input AS (\n  SELECT\n    {{ $('Lookup Restaurant Context').item.json.restaurant_id || 'NULL' }}::bigint AS restaurant_id,\n    {{ $('Verify Channel Source').item.json.requested_datetime_sql }}::timestamptz AS start_time,\n    {{ $('Verify Channel Source').item.json.party_size_sql }}::int AS party_size,\n    {{ $('Verify Channel Source').item.json.full_name_sql }}::text AS full_name,\n    NULLIF('{{ String($('Verify Channel Source').item.json.conversation_id || '').replace(/'/g, \"''\") }}', '')::text AS conversation_id\n),\nexisting AS (\n  SELECT\n    r.id,\n    r.client_id,\n    r.status,\n    r.start_time,\n    r.party_size,\n    r.conversation_id,\n    CASE\n      WHEN i.conversation_id IS NOT NULL\n        AND r.conversation_id = i.conversation_id\n        THEN 1\n      WHEN i.full_name IS NOT NULL\n        AND lower(COALESCE(c.full_name, '')) = lower(i.full_name)\n        THEN 2\n      ELSE 9\n    END AS match_rank\n  FROM reservations r\n  LEFT JOIN clients c ON c.id = r.client_id\n  CROSS JOIN input i\n  WHERE r.restaurant_id = i.restaurant_id\n    AND i.start_time IS NOT NULL\n    AND r.start_time = i.start_time\n    AND r.status IN ('confirmed', 'pending')\n    AND (\n      (\n        i.conversation_id IS NOT NULL\n        AND r.conversation_id = i.conversation_id\n      )\n      OR\n      (\n        i.full_name IS NOT NULL\n        AND i.party_size IS NOT NULL\n        AND r.party_size = i.party_size\n        AND lower(COALESCE(c.full_name, '')) = lower(i.full_name)\n      )\n    )\n  ORDER BY match_rank ASC, r.created_at DESC\n  LIMIT 1\n)\nSELECT\n  EXISTS (SELECT 1 FROM existing) AS reservation_exists,\n  (SELECT id FROM existing) AS existing_reservation_id,\n  (SELECT client_id FROM existing) AS existing_client_id,\n  (SELECT status FROM existing) AS existing_reservation_status,\n  (SELECT conversation_id FROM existing) AS existing_conversation_id,\n  (SELECT match_rank FROM existing) AS existing_match_rank;",
+        "options": {}
+      },
+      "id": "ee0eaa6f-7d68-49c5-90a5-fac552f9e5ac",
+      "name": "Check Existing Reservation",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        864
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SaasPgBusinessV2",
+          "name": "Postgres @@CLIENT_ID@@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH input AS (\n  SELECT\n    {{ $('Lookup Restaurant Context').item.json.restaurant_id || 'NULL' }}::bigint AS restaurant_id,\n    {{ $('Verify Channel Source').item.json.full_name_sql }}::text AS full_name,\n    {{ $('Verify Channel Source').item.json.phone_sql }}::text AS phone,\n    {{ $('Verify Channel Source').item.json.email_sql }}::text AS email,\n    {{ $('Verify Channel Source').item.json.customer_confirmed_sql }}::boolean AS customer_confirmed,\n    {{ $('Verify Channel Source').item.json.action_sql }}::text AS action\n),\nexisting AS (\n  SELECT c.*\n  FROM clients c, input i\n  WHERE i.action = 'create_reservation'\n    AND i.customer_confirmed = true\n    AND i.restaurant_id IS NOT NULL\n    AND (\n      (i.phone IS NOT NULL AND c.phone = i.phone)\n      OR\n      (i.email IS NOT NULL AND c.email = i.email)\n    )\n  ORDER BY c.updated_at DESC NULLS LAST, c.created_at DESC NULLS LAST\n  LIMIT 1\n),\ninserted AS (\n  INSERT INTO clients (\n    restaurant_id,\n    full_name,\n    phone,\n    email,\n    is_new_customer,\n    consent_notifications,\n    consent_marketing,\n    created_at,\n    updated_at\n  )\n  SELECT\n    i.restaurant_id,\n    COALESCE(NULLIF(i.full_name, ''), 'Client'),\n    NULLIF(i.phone, ''),\n    NULLIF(i.email, ''),\n    TRUE,\n    TRUE,\n    FALSE,\n    NOW(),\n    NOW()\n  FROM input i\n  WHERE i.action = 'create_reservation'\n    AND i.customer_confirmed = true\n    AND i.restaurant_id IS NOT NULL\n    AND i.full_name IS NOT NULL\n    AND NOT EXISTS (SELECT 1 FROM existing)\n  RETURNING *\n),\nchosen AS (\n  SELECT * FROM inserted\n  UNION ALL\n  SELECT * FROM existing\n  LIMIT 1\n)\nSELECT\n  EXISTS (SELECT 1 FROM chosen) AS client_ready,\n  (SELECT id FROM chosen) AS client_id,\n  (SELECT full_name FROM chosen) AS client_full_name,\n  (SELECT phone FROM chosen) AS client_phone,\n  (SELECT email FROM chosen) AS client_email;",
+        "options": {}
+      },
+      "id": "15f01ea8-5e6c-4b9a-87db-06a23e21eed2",
+      "name": "Upsert Client When Needed",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        864
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SaasPgBusinessV2",
+          "name": "Postgres @@CLIENT_ID@@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH input AS (\n  SELECT\n    {{ $('Lookup Restaurant Context').item.json.restaurant_id || 'NULL' }}::bigint AS restaurant_id,\n    {{ $('Upsert Client When Needed').item.json.client_id || 'NULL' }}::bigint AS client_id,\n    {{ $('Verify Channel Source').item.json.requested_datetime_sql }}::timestamptz AS start_time,\n    {{ $('Verify Channel Source').item.json.party_size_sql }}::int AS party_size,\n    {{ $('Verify Channel Source').item.json.special_request_sql }}::text AS special_request,\n    {{ $('Lookup Restaurant Context').item.json.default_meal_duration_minutes || 120 }}::int AS meal_duration_minutes,\n    {{ $('Lookup Restaurant Context').item.json.cleaning_buffer_minutes || 15 }}::int AS cleaning_buffer_minutes,\n    {{ $('Verify Channel Source').item.json.customer_confirmed_sql }}::boolean AS customer_confirmed,\n    {{ $('Verify Channel Source').item.json.action_sql }}::text AS action,\n    {{ $('Verify Channel Source').item.json.source_sql }}::text AS source_channel,\n    NULLIF('{{ String($('Verify Channel Source').item.json.conversation_id || '').replace(/'/g, \"''\") }}', '')::text AS conversation_id,\n    {{ $('Check Existing Reservation').item.json.reservation_exists ? 'TRUE' : 'FALSE' }}::boolean AS reservation_exists,\n    {{ $('Check Closure For Request').item.json.is_closed ? 'TRUE' : 'FALSE' }}::boolean AS is_closed\n),\ninserted AS (\n  INSERT INTO reservations (\n    restaurant_id,\n    client_id,\n    conversation_id,\n    source_channel,\n    status,\n    party_size,\n    start_time,\n    end_time,\n    meal_duration_minutes,\n    cleaning_buffer_minutes,\n    special_request,\n    created_at,\n    updated_at\n  )\n  SELECT\n    i.restaurant_id,\n    i.client_id,\n    i.conversation_id,\n    COALESCE(i.source_channel, 'retell_voice'),\n    'confirmed',\n    i.party_size,\n    i.start_time,\n    i.start_time + (i.meal_duration_minutes || ' minutes')::interval,\n    i.meal_duration_minutes,\n    i.cleaning_buffer_minutes,\n    NULLIF(i.special_request, ''),\n    NOW(),\n    NOW()\n  FROM input i\n  WHERE i.action = 'create_reservation'\n    AND i.customer_confirmed = true\n    AND i.restaurant_id IS NOT NULL\n    AND i.client_id IS NOT NULL\n    AND i.start_time IS NOT NULL\n    AND i.party_size IS NOT NULL\n    AND i.reservation_exists = false\n    AND i.is_closed = false\n  ON CONFLICT (restaurant_id, conversation_id, start_time)\n  WHERE conversation_id IS NOT NULL\n  DO UPDATE SET\n    updated_at = reservations.updated_at\n  RETURNING *\n)\nSELECT\n  EXISTS (SELECT 1 FROM inserted) AS reservation_created,\n  (SELECT id FROM inserted) AS reservation_id,\n  (SELECT client_id FROM inserted) AS client_id,\n  (SELECT status FROM inserted) AS reservation_status,\n  (SELECT start_time FROM inserted) AS start_time,\n  (SELECT end_time FROM inserted) AS end_time,\n  (SELECT conversation_id FROM inserted) AS conversation_id;",
+        "options": {}
+      },
+      "id": "93ce9bbe-9df2-4267-9c6e-5b1ca0f0887c",
+      "name": "Create Reservation When Needed",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        2288,
+        864
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SaasPgBusinessV2",
+          "name": "Postgres @@CLIENT_ID@@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH input AS (\n  SELECT\n    {{ $('Lookup Restaurant Context').item.json.restaurant_id || 'NULL' }}::bigint AS restaurant_id,\n    {{ $('Verify Channel Source').item.json.conversation_id_sql }}::text AS conversation_id,\n    {{ $('Verify Channel Source').item.json.external_event_id_sql }}::text AS external_event_id,\n    {{ $('Verify Channel Source').item.json.call_id_sql }}::text AS call_id,\n    {{ $('Verify Channel Source').item.json.sms_id_sql }}::text AS sms_id,\n    {{ $('Verify Channel Source').item.json.email_message_id_sql }}::text AS email_message_id,\n    {{ $('Verify Channel Source').item.json.instagram_message_id_sql }}::text AS instagram_message_id,\n    {{ $('Verify Channel Source').item.json.source_sql }}::text AS source,\n    {{ $('Verify Channel Source').item.json.channel_sql }}::text AS channel,\n    {{ $('Verify Channel Source').item.json.provider_sql }}::text AS provider,\n    {{ $('Verify Channel Source').item.json.phone_sql }}::text AS phone,\n    {{ $('Verify Channel Source').item.json.email_sql }}::text AS email,\n    {{ $('Verify Channel Source').item.json.summary_sql }}::text AS summary,\n    {{ $('Verify Channel Source').item.json.transcript_sql }}::text AS transcript,\n    {{ $('Verify Channel Source').item.json.user_message_sql }}::text AS user_message,\n    {{ $('Verify Channel Source').item.json.raw_payload_sql }} AS raw_payload,\n    {{ $('Verify Channel Source').item.json.action_sql }}::text AS action\n),\ninserted AS (\n  INSERT INTO channel_conversation_logs (\n    restaurant_id,\n    conversation_id,\n    external_event_id,\n    call_id,\n    sms_id,\n    email_message_id,\n    instagram_message_id,\n    source,\n    channel,\n    provider,\n    phone,\n    email,\n    summary,\n    transcript,\n    user_message,\n    raw_payload,\n    created_at\n  )\n  SELECT\n    restaurant_id,\n    conversation_id,\n    external_event_id,\n    call_id,\n    sms_id,\n    email_message_id,\n    instagram_message_id,\n    source,\n    channel,\n    provider,\n    phone,\n    email,\n    summary,\n    transcript,\n    user_message,\n    raw_payload,\n    NOW()\n  FROM input\n  WHERE conversation_id IS NOT NULL\n    AND external_event_id IS NOT NULL\n    AND action IN ('log_conversation', 'message_inbound', 'check_availability', 'create_reservation', 'get_restaurant_context')\n  ON CONFLICT (conversation_id, external_event_id)\n  DO UPDATE SET\n    summary = COALESCE(EXCLUDED.summary, channel_conversation_logs.summary),\n    transcript = COALESCE(EXCLUDED.transcript, channel_conversation_logs.transcript),\n    user_message = COALESCE(EXCLUDED.user_message, channel_conversation_logs.user_message),\n    raw_payload = EXCLUDED.raw_payload\n  RETURNING *\n)\nSELECT\n  EXISTS (SELECT 1 FROM inserted) AS log_saved,\n  (SELECT id FROM inserted) AS log_id;",
+        "options": {}
+      },
+      "id": "47f250b6-d3d7-42d2-b560-725b8e60d2dc",
+      "name": "Save Channel Log",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        2848,
+        864
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SaasPgBusinessV2",
+          "name": "Postgres @@CLIENT_ID@@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function nodeJson(name) {\n  try {\n    return $(name).item.json || {};\n  } catch (e) {\n    return {};\n  }\n}\n\nfunction hasValue(v) {\n  return v !== undefined && v !== null && v !== '';\n}\n\nfunction readFieldFrom(obj, field) {\n  const candidates = [\n    obj?.[field],\n    obj?.body?.[field],\n    obj?.body?.args?.[field],\n    obj?.body?.arguments?.[field],\n    obj?.args?.[field],\n    obj?.arguments?.[field],\n    obj?.query?.[field]\n  ];\n\n  return candidates.find(hasValue);\n}\n\nconst verifyJson = nodeJson('Verify Channel Source');\nconst webhookJson = nodeJson('Webhook Retell Voice Function');\nconst markJson = nodeJson('Mark Retell Voice Source');\n\nfunction pickField(field, fallback = null) {\n  const sources = [\n    verifyJson,\n    markJson,\n    webhookJson\n  ];\n\n  for (const source of sources) {\n    const value = readFieldFrom(source, field);\n    if (hasValue(value)) return value;\n  }\n\n  return fallback;\n}\n\nconst req = {\n  ...verifyJson,\n\n  date_text: pickField('date_text', verifyJson.date_text),\n  time_text: pickField('time_text', verifyJson.time_text),\n  current_datetime: pickField('current_datetime', verifyJson.current_datetime),\n  restaurant_timezone: pickField('restaurant_timezone', verifyJson.restaurant_timezone),\n\n  requested_datetime: pickField('requested_datetime', verifyJson.requested_datetime),\n  party_size: pickField('party_size', verifyJson.party_size),\n  full_name: pickField('full_name', verifyJson.full_name),\n  phone: pickField('phone', verifyJson.phone),\n  email: pickField('email', verifyJson.email),\n  special_request: pickField('special_request', verifyJson.special_request),\n  customer_confirmed: pickField('customer_confirmed', verifyJson.customer_confirmed),\n  restaurant_slug: pickField('restaurant_slug', verifyJson.restaurant_slug),\n  conversation_id: pickField('conversation_id', verifyJson.conversation_id)\n};\n\nconst restaurant = $('Lookup Restaurant Context').item.json;\nconst closure = $('Check Closure For Request').item.json;\nconst existing = $('Check Existing Reservation').item.json;\nconst client = $('Upsert Client When Needed').item.json;\nconst reservation = $('Create Reservation When Needed').item.json;\nconst log = $('Save Channel Log').item.json;\n\nfunction bool(v) {\n  return v === true || v === 'true' || v === 1 || v === '1';\n}\n\nfunction pad(n) {\n  return String(n).padStart(2, '0');\n}\n\nfunction normalizeText(v) {\n  return String(v || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[’']/g, ' ')\n    .replace(/-/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction formatDateHumanFr(iso, timezone = 'Europe/Paris') {\n  if (!iso) return null;\n\n  const d = new Date(iso);\n  if (Number.isNaN(d.getTime())) return null;\n\n  const date = d.toLocaleDateString('fr-FR', {\n    weekday: 'long',\n    day: 'numeric',\n    month: 'long',\n    year: 'numeric',\n    timeZone: timezone\n  });\n\n  const parts = new Intl.DateTimeFormat('fr-FR', {\n    hour: 'numeric',\n    minute: '2-digit',\n    hour12: false,\n    timeZone: timezone\n  }).formatToParts(d);\n\n  const hour = Number(parts.find(p => p.type === 'hour')?.value ?? 0);\n  const minute = Number(parts.find(p => p.type === 'minute')?.value ?? 0);\n\n  let timeLabel;\n\n  if (hour === 12 && minute === 0) {\n    timeLabel = 'midi';\n  } else if (hour === 12 && minute === 30) {\n    timeLabel = 'midi trente';\n  } else if (minute === 0) {\n    timeLabel = `${hour} heure${hour > 1 ? 's' : ''}`;\n  } else {\n    timeLabel = `${hour}h${pad(minute)}`;\n  }\n\n  return `${date} à ${timeLabel}`;\n}\n\nfunction getTimezoneOffsetMinutes(date, timeZone) {\n  const dtf = new Intl.DateTimeFormat('en-US', {\n    timeZone,\n    hour12: false,\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n    hour: '2-digit',\n    minute: '2-digit',\n    second: '2-digit'\n  });\n\n  const parts = dtf.formatToParts(date).reduce((acc, part) => {\n    if (part.type !== 'literal') acc[part.type] = part.value;\n    return acc;\n  }, {});\n\n  const asUTC = Date.UTC(\n    Number(parts.year),\n    Number(parts.month) - 1,\n    Number(parts.day),\n    Number(parts.hour),\n    Number(parts.minute),\n    Number(parts.second)\n  );\n\n  return (asUTC - date.getTime()) / 60000;\n}\n\nfunction offsetToString(offsetMinutes) {\n  const sign = offsetMinutes >= 0 ? '+' : '-';\n  const abs = Math.abs(offsetMinutes);\n  const h = Math.floor(abs / 60);\n  const m = abs % 60;\n  return `${sign}${pad(h)}:${pad(m)}`;\n}\n\nfunction makeZonedIso(year, monthIndex, day, hour, minute, timezone = 'Europe/Paris') {\n  const utcGuess = new Date(Date.UTC(year, monthIndex, day, hour, minute, 0));\n  let offset = getTimezoneOffsetMinutes(utcGuess, timezone);\n\n  let utcDate = new Date(Date.UTC(year, monthIndex, day, hour, minute, 0) - offset * 60000);\n  offset = getTimezoneOffsetMinutes(utcDate, timezone);\n\n  utcDate = new Date(Date.UTC(year, monthIndex, day, hour, minute, 0) - offset * 60000);\n\n  return {\n    iso: `${year}-${pad(monthIndex + 1)}-${pad(day)}T${pad(hour)}:${pad(minute)}:00${offsetToString(offset)}`,\n    utcDate,\n    offset\n  };\n}\n\nfunction getParisParts(date, timezone = 'Europe/Paris') {\n  const parts = new Intl.DateTimeFormat('fr-FR', {\n    timeZone: timezone,\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n    weekday: 'long',\n    hour: '2-digit',\n    minute: '2-digit',\n    hour12: false\n  }).formatToParts(date).reduce((acc, part) => {\n    if (part.type !== 'literal') acc[part.type] = part.value;\n    return acc;\n  }, {});\n\n  const weekdays = {\n    dimanche: 0,\n    lundi: 1,\n    mardi: 2,\n    mercredi: 3,\n    jeudi: 4,\n    vendredi: 5,\n    samedi: 6\n  };\n\n  return {\n    year: Number(parts.year),\n    monthIndex: Number(parts.month) - 1,\n    day: Number(parts.day),\n    weekday: weekdays[normalizeText(parts.weekday)],\n    hour: Number(parts.hour),\n    minute: Number(parts.minute)\n  };\n}\n\nfunction wordsToNumber(text) {\n  const t = normalizeText(text);\n\n  const numbers = {\n    'un': 1,\n    'une': 1,\n    'deux': 2,\n    'trois': 3,\n    'quatre': 4,\n    'cinq': 5,\n    'six': 6,\n    'sept': 7,\n    'huit': 8,\n    'neuf': 9,\n    'dix': 10,\n    'onze': 11,\n    'douze': 12,\n    'treize': 13,\n    'quatorze': 14,\n    'quinze': 15,\n    'seize': 16,\n    'dix sept': 17,\n    'dix huit': 18,\n    'dix neuf': 19,\n    'vingt': 20,\n    'vingt et un': 21,\n    'vingt et une': 21,\n    'vingt deux': 22,\n    'vingt trois': 23,\n    'vingt quatre': 24,\n    'vingt cinq': 25,\n    'vingt six': 26,\n    'vingt sept': 27,\n    'vingt huit': 28,\n    'vingt neuf': 29,\n    'trente': 30,\n    'trente et un': 31\n  };\n\n  if (/^\\d+$/.test(t)) return Number(t);\n\n  return numbers[t] ?? null;\n}\n\nfunction parseDateText(dateText, currentDate, timezone = 'Europe/Paris') {\n  const raw = normalizeText(dateText);\n  const base = getParisParts(currentDate, timezone);\n\n  const weekdays = {\n    dimanche: 0,\n    lundi: 1,\n    mardi: 2,\n    mercredi: 3,\n    jeudi: 4,\n    vendredi: 5,\n    samedi: 6\n  };\n\n  const months = {\n    janvier: 0,\n    fevrier: 1,\n    mars: 2,\n    avril: 3,\n    mai: 4,\n    juin: 5,\n    juillet: 6,\n    aout: 7,\n    septembre: 8,\n    octobre: 9,\n    novembre: 10,\n    decembre: 11\n  };\n\n  let year = base.year;\n  let monthIndex = base.monthIndex;\n  let day = base.day;\n\n  if (raw.includes('aujourd')) {\n    return { year, monthIndex, day };\n  }\n\n  if (raw.includes('demain')) {\n    const d = new Date(Date.UTC(base.year, base.monthIndex, base.day, 12, 0, 0));\n    d.setUTCDate(d.getUTCDate() + 1);\n    return {\n      year: d.getUTCFullYear(),\n      monthIndex: d.getUTCMonth(),\n      day: d.getUTCDate()\n    };\n  }\n\n  const absoluteMatch = raw.match(/(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\\s*(\\d{1,2}|un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|dix sept|dix huit|dix neuf|vingt|vingt et un|vingt et une|vingt deux|vingt trois|vingt quatre|vingt cinq|vingt six|vingt sept|vingt huit|vingt neuf|trente|trente et un)\\s+(janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre)(?:\\s+(\\d{4}|deux mille vingt six|deux mille vingt sept))?/);\n\n  if (absoluteMatch) {\n    const parsedDay = wordsToNumber(absoluteMatch[1]);\n    const parsedMonth = months[absoluteMatch[2]];\n\n    let parsedYear = base.year;\n\n    if (absoluteMatch[3]) {\n      const y = normalizeText(absoluteMatch[3]);\n      if (/^\\d{4}$/.test(y)) parsedYear = Number(y);\n      if (y === 'deux mille vingt six') parsedYear = 2026;\n      if (y === 'deux mille vingt sept') parsedYear = 2027;\n    }\n\n    const candidate = makeZonedIso(parsedYear, parsedMonth, parsedDay, 12, 0, timezone).utcDate;\n\n    if (candidate < currentDate && !absoluteMatch[3]) {\n      parsedYear += 1;\n    }\n\n    return {\n      year: parsedYear,\n      monthIndex: parsedMonth,\n      day: parsedDay\n    };\n  }\n\n  for (const [weekdayName, targetWeekday] of Object.entries(weekdays)) {\n    if (raw.includes(weekdayName)) {\n      let delta = (targetWeekday - base.weekday + 7) % 7;\n\n      if (delta === 0) {\n        delta = 7;\n      }\n\n      const d = new Date(Date.UTC(base.year, base.monthIndex, base.day, 12, 0, 0));\n      d.setUTCDate(d.getUTCDate() + delta);\n\n      return {\n        year: d.getUTCFullYear(),\n        monthIndex: d.getUTCMonth(),\n        day: d.getUTCDate()\n      };\n    }\n  }\n\n  return null;\n}\n\nfunction parseTimeText(dateText, timeText) {\n  const raw = normalizeText(`${dateText || ''} ${timeText || ''}`);\n\n  if (raw.includes('midi trente') || raw.includes('midi et demi') || raw.includes('12h30') || raw.includes('12 h 30')) {\n    return { hour: 12, minute: 30 };\n  }\n\n  if (raw.includes('midi quart') || raw.includes('midi et quart') || raw.includes('12h15') || raw.includes('12 h 15')) {\n    return { hour: 12, minute: 15 };\n  }\n\n  if (raw.includes('midi moins le quart') || raw.includes('11h45') || raw.includes('11 h 45')) {\n    return { hour: 11, minute: 45 };\n  }\n\n  if (raw.includes('midi')) {\n    return { hour: 12, minute: 0 };\n  }\n\n  if (raw.includes('soir')) {\n    const explicitTime = parseExplicitTime(raw);\n    if (explicitTime) {\n      if (explicitTime.hour >= 1 && explicitTime.hour <= 11) {\n        explicitTime.hour += 12;\n      }\n      return explicitTime;\n    }\n\n    return { hour: 19, minute: 0 };\n  }\n\n  const explicitTime = parseExplicitTime(raw);\n  if (explicitTime) return explicitTime;\n\n  return null;\n}\n\nfunction parseExplicitTime(raw) {\n  let match = raw.match(/(\\d{1,2})\\s*h\\s*(\\d{1,2})?/);\n  if (match) {\n    return {\n      hour: Number(match[1]),\n      minute: match[2] ? Number(match[2]) : 0\n    };\n  }\n\n  match = raw.match(/(\\d{1,2})\\s*:\\s*(\\d{2})/);\n  if (match) {\n    return {\n      hour: Number(match[1]),\n      minute: Number(match[2])\n    };\n  }\n\n  match = raw.match(/(\\d{1,2})\\s*heures?\\s*(\\d{1,2})?/);\n  if (match) {\n    return {\n      hour: Number(match[1]),\n      minute: match[2] ? Number(match[2]) : 0\n    };\n  }\n\n  const wordHours = [\n    ['vingt trois', 23],\n    ['vingt deux', 22],\n    ['vingt et une', 21],\n    ['vingt et un', 21],\n    ['vingt', 20],\n    ['dix neuf', 19],\n    ['dix huit', 18],\n    ['dix sept', 17],\n    ['seize', 16],\n    ['quinze', 15],\n    ['quatorze', 14],\n    ['treize', 13],\n    ['douze', 12],\n    ['onze', 11],\n    ['dix', 10],\n    ['neuf', 9],\n    ['huit', 8],\n    ['sept', 7],\n    ['six', 6],\n    ['cinq', 5],\n    ['quatre', 4],\n    ['trois', 3],\n    ['deux', 2],\n    ['une', 1],\n    ['un', 1]\n  ];\n\n  for (const [label, hour] of wordHours) {\n    if (raw.includes(`${label} heure`) || raw.includes(`${label} heures`)) {\n      let minute = 0;\n\n      if (raw.includes('trente')) minute = 30;\n      if (raw.includes('quart')) minute = 15;\n      if (raw.includes('moins le quart')) {\n        return {\n          hour: hour - 1,\n          minute: 45\n        };\n      }\n\n      return { hour, minute };\n    }\n  }\n\n  return null;\n}\n\nconst restaurantFound = bool(restaurant.restaurant_found);\nconst isClosed = bool(closure.is_closed);\nconst reservationExists = bool(existing.reservation_exists);\nconst reservationCreated = bool(reservation.reservation_created);\nconst logSaved = bool(log.log_saved);\n\nconst timezone = restaurant.timezone || req.restaurant_timezone || 'Europe/Paris';\nconst humanDate = formatDateHumanFr(req.requested_datetime, timezone);\nconst missing = [];\n\nif (['check_availability', 'create_reservation'].includes(req.action)) {\n  if (!req.requested_datetime) missing.push('requested_datetime');\n  if (!req.party_size) missing.push('party_size');\n}\n\nif (req.action === 'create_reservation') {\n  if (!req.full_name) missing.push('full_name');\n  if (!req.customer_confirmed) missing.push('customer_confirmed');\n}\n\nlet response = {\n  ok: false,\n  action: req.action || 'unknown',\n  source: req.source,\n  channel: req.channel,\n  provider: req.provider,\n  conversation_id: req.conversation_id,\n  external_event_id: req.external_event_id,\n  source_verified_for_test: req.source_verified_for_test,\n  source_verified_cryptographically: req.source_verified_cryptographically,\n  source_verification_status: req.source_verification_status,\n  source_warnings: req.source_warnings || [],\n  restaurant_found: restaurantFound,\n  restaurant_id: restaurant.restaurant_id ?? null,\n  restaurant_slug: restaurant.restaurant_slug ?? req.restaurant_slug ?? null,\n  restaurant_name: restaurant.restaurant_name ?? null,\n  decision: 'technical_error',\n  reply: \"Désolé, je rencontre un problème technique. Le restaurant pourra reprendre la demande directement.\",\n  needs_followup: false,\n  missing_fields: [],\n  available: false,\n  confirmed: false,\n  duplicate: false,\n  reservation_id: null,\n  client_id: null,\n  log_saved: logSaved,\n  log_id: log.log_id ?? null,\n  error_code: null,\n  async_outbound_required: ['email', 'instagram'].includes(req.source)\n};\n\nif (req.requested_datetime) {\n  response.requested_datetime = req.requested_datetime;\n  response.resolved_requested_datetime = req.requested_datetime;\n  response.human_date = humanDate;\n  response.resolved_human_date = humanDate;\n  response.restaurant_timezone = timezone;\n}\n\nif (req.party_size) {\n  response.party_size = Number(req.party_size);\n}\n\nif (req.full_name) {\n  response.full_name = req.full_name;\n}\n\nconst supportedActions = [\n  'get_restaurant_context',\n  'resolve_reservation_datetime',\n  'check_availability',\n  'create_reservation',\n  'log_conversation',\n  'message_inbound'\n];\n\nif (!req.action || !supportedActions.includes(req.action)) {\n  response.error_code = 'UNSUPPORTED_ACTION';\n  response.decision = 'technical_error';\n  response.reply = \"Action non prise en charge par le service de réservation.\";\n  return [{ json: response }];\n}\n\nif (!restaurantFound && req.action !== 'log_conversation') {\n  response.error_code = 'RESTAURANT_NOT_FOUND';\n  response.decision = 'need_human';\n  response.reply = \"Je suis désolé, je n’arrive pas à identifier le restaurant concerné. Pouvez-vous vérifier le canal utilisé ou rappeler le restaurant directement ?\";\n  return [{ json: response }];\n}\n\nconst requestedDate = req.requested_datetime ? new Date(req.requested_datetime) : null;\nconst now = new Date();\n\nconst requestedDateIsInvalid =\n  req.requested_datetime &&\n  (Number.isNaN(requestedDate.getTime()) || requestedDate < now);\n\nif (['check_availability', 'create_reservation'].includes(req.action) && requestedDateIsInvalid) {\n  response.ok = false;\n  response.decision = 'date_clarification_needed';\n  response.available = false;\n  response.confirmed = false;\n  response.error_code = 'REQUESTED_DATETIME_IN_PAST';\n  response.reply = \"Je n’ai pas pu interpréter correctement la date. Pouvez-vous me donner la date complète, par exemple mercredi 22 juillet ?\";\n  response.missing_fields = ['requested_datetime'];\n  return [{ json: response }];\n}\n\nif (req.action === 'message_inbound') {\n  response.ok = true;\n  response.decision = 'message_received_needs_core_agent';\n  response.needs_followup = true;\n  response.reply = \"Bonjour, votre demande est bien reçue. Pouvez-vous préciser la date, l’heure, le nombre de personnes et le nom pour la réservation ?\";\n  response.missing_fields = ['requested_datetime', 'party_size', 'full_name'];\n  response.note = \"Blueprint router: à remplacer ensuite par l’appel au Reservation Core / Agent Conversationnel.\";\n  return [{ json: response }];\n}\n\nif (req.action === 'get_restaurant_context') {\n  const currentDatetime = new Date();\n\n  response.ok = true;\n  response.decision = 'context_ready';\n  response.reply = `Vous êtes l’agent de réservation du restaurant ${restaurant.restaurant_name}.`;\n  response.available = null;\n  response.context = {\n    restaurant_id: restaurant.restaurant_id,\n    restaurant_slug: restaurant.restaurant_slug,\n    restaurant_name: restaurant.restaurant_name,\n    timezone,\n    current_datetime: currentDatetime.toISOString(),\n    current_datetime_human: formatDateHumanFr(currentDatetime.toISOString(), timezone),\n    max_party_size: Number(restaurant.max_party_size || 12),\n    default_meal_duration_minutes: Number(restaurant.default_meal_duration_minutes || 120),\n    cleaning_buffer_minutes: Number(restaurant.cleaning_buffer_minutes || 15),\n    booking_policy: restaurant.booking_policy ?? null,\n    event_notification_policy: restaurant.event_notification_policy ?? null\n  };\n  return [{ json: response }];\n}\n\nif (req.action === 'resolve_reservation_datetime') {\n  const dateText = req.date_text || '';\n  const timeText = req.time_text || '';\n  const currentDatetimeRaw = req.current_datetime || new Date().toISOString();\n  const currentDate = new Date(currentDatetimeRaw);\n\n  if (!dateText) {\n    response.ok = false;\n    response.decision = 'datetime_clarification_needed';\n    response.error_code = 'DATE_TEXT_MISSING';\n    response.reply = \"Pour quel jour souhaitez-vous réserver ?\";\n    response.missing_fields = ['date_text'];\n    return [{ json: response }];\n  }\n\n  if (!timeText) {\n    response.ok = false;\n    response.decision = 'datetime_clarification_needed';\n    response.error_code = 'TIME_TEXT_MISSING';\n    response.reply = \"Pour quel horaire souhaitez-vous réserver ?\";\n    response.missing_fields = ['time_text'];\n    return [{ json: response }];\n  }\n\n  if (Number.isNaN(currentDate.getTime())) {\n    response.ok = false;\n    response.decision = 'datetime_clarification_needed';\n    response.error_code = 'INVALID_CURRENT_DATETIME';\n    response.reply = \"Je n’arrive pas à interpréter la date actuelle. Pouvez-vous me donner la date complète ?\";\n    response.missing_fields = ['current_datetime'];\n    return [{ json: response }];\n  }\n  const resolvedDate = parseDateText(dateText, currentDate, timezone);\n  const resolvedTime = parseTimeText(dateText, timeText);\n  \n  const normalizedTimeText = normalizeText(timeText);\n  const normalizedDateText = normalizeText(dateText);\n  const normalizedFullText = `${normalizedDateText} ${normalizedTimeText}`;\n  \n  /**\n   * Protection restaurant :\n   * Une heure entre 1 et 6 est ambiguë.\n   * Exemple : \"une heure et quart\" peut vouloir dire 1h15 ou 13h15.\n   * On ne doit pas confirmer automatiquement.\n   */\n  if (\n    resolvedTime &&\n    resolvedTime.hour >= 1 &&\n    resolvedTime.hour <= 6 &&\n    !normalizedFullText.includes('matin') &&\n    !normalizedFullText.includes('apres midi') &&\n    !normalizedFullText.includes('apres-midi') &&\n    !normalizedFullText.includes('soir') &&\n    !normalizedFullText.includes('dejeuner') &&\n    !normalizedFullText.includes('diner') &&\n    !normalizedFullText.includes('déjeuner') &&\n    !normalizedFullText.includes('dîner')\n  ) {\n    response.ok = false;\n    response.decision = 'time_clarification_needed';\n    response.error_code = 'AMBIGUOUS_RESTAURANT_TIME';\n    response.available = false;\n    response.confirmed = false;\n    response.reply = `Pour confirmer, vous voulez dire ${resolvedTime.hour + 12}h${resolvedTime.minute ? pad(resolvedTime.minute) : ''} ?`;\n    response.missing_fields = ['time_text'];\n    response.human_date = null;\n    response.requested_datetime = null;\n    response.resolved_requested_datetime = null;\n  \n    const responseBody = { ...response };\n    response.response_body = responseBody;\n  \n    return [{ json: response }];\n  }\n\n  if (!resolvedDate) {\n    response.ok = false;\n    response.decision = 'datetime_clarification_needed';\n    response.error_code = 'DATE_NOT_RESOLVED';\n    response.reply = \"Je n’ai pas pu interpréter correctement la date. Pouvez-vous me donner la date complète, par exemple mercredi 22 juillet ?\";\n    response.missing_fields = ['date_text'];\n    return [{ json: response }];\n  }\n\n  if (!resolvedTime) {\n    response.ok = false;\n    response.decision = 'datetime_clarification_needed';\n    response.error_code = 'TIME_NOT_RESOLVED';\n    response.reply = \"Pour quel horaire souhaitez-vous réserver ?\";\n    response.missing_fields = ['time_text'];\n    return [{ json: response }];\n  }\n\n  const zoned = makeZonedIso(\n    resolvedDate.year,\n    resolvedDate.monthIndex,\n    resolvedDate.day,\n    resolvedTime.hour,\n    resolvedTime.minute,\n    timezone\n  );\n\n  if (zoned.utcDate < currentDate) {\n    response.ok = false;\n    response.decision = 'datetime_clarification_needed';\n    response.error_code = 'REQUESTED_DATETIME_IN_PAST';\n    response.reply = \"Je n’ai pas pu interpréter correctement la date. Pouvez-vous me donner la date complète ?\";\n    response.missing_fields = ['date_text'];\n    return [{ json: response }];\n  }\n\n  const resolvedHumanDate = formatDateHumanFr(zoned.iso, timezone);\n\n  response.ok = true;\n  response.decision = 'datetime_resolved';\n  response.available = null;\n  response.confirmed = false;\n  response.requested_datetime = zoned.iso;\n  response.resolved_requested_datetime = zoned.iso;\n  response.human_date = resolvedHumanDate;\n  response.resolved_human_date = resolvedHumanDate;\n  response.restaurant_timezone = timezone;\n  response.reply = `Très bien, j’ai compris : ${resolvedHumanDate}.`;\n  response.missing_fields = [];\n\n  return [{ json: response }];\n}\n\nif (req.action === 'check_availability') {\n  if (missing.length > 0) {\n    response.ok = true;\n    response.decision = 'need_followup';\n    response.needs_followup = true;\n    response.missing_fields = missing;\n    response.error_code = 'MISSING_REQUIRED_FIELDS';\n    response.reply = \"Il me manque la date, l’heure ou le nombre de personnes pour vérifier le créneau.\";\n    return [{ json: response }];\n  }\n\n  if (Number(req.party_size) > Number(restaurant.max_party_size || 12)) {\n    response.ok = true;\n    response.decision = 'unavailable';\n    response.available = false;\n    response.error_code = 'PARTY_SIZE_TOO_LARGE';\n    response.reply = `Pour ${req.party_size} personnes, je dois transmettre la demande au restaurant. Le maximum standard est de ${restaurant.max_party_size || 12} personnes.`;\n    return [{ json: response }];\n  }\n\n  if (isClosed) {\n    response.ok = true;\n    response.decision = 'unavailable';\n    response.available = false;\n    response.error_code = 'RESTAURANT_CLOSED';\n    response.reply = `Désolé, le restaurant est fermé sur ce créneau${closure.closure_reason ? ` : ${closure.closure_reason}` : ''}. Souhaitez-vous choisir un autre horaire ?`;\n    return [{ json: response }];\n  }\n\n  response.ok = true;\n  response.available = true;\n\n  if (!req.full_name) {\n    response.decision = 'available_needs_name';\n    response.needs_followup = true;\n    response.missing_fields = ['full_name'];\n    response.reply = `Le créneau est disponible pour ${req.party_size} personne${Number(req.party_size) > 1 ? 's' : ''}${humanDate ? ` le ${humanDate}` : ''}. À quel nom dois-je noter la réservation ?`;\n    return [{ json: response }];\n  }\n\n  response.decision = 'available_waiting_confirmation';\n  response.reply = `Le créneau est disponible pour ${req.party_size} personne${Number(req.party_size) > 1 ? 's' : ''}${humanDate ? ` le ${humanDate}` : ''}, au nom de ${req.full_name}. Souhaitez-vous confirmer la réservation ?`;\n  return [{ json: response }];\n}\n\nif (req.action === 'create_reservation') {\n  if (missing.length > 0) {\n    response.ok = true;\n    response.decision = 'need_followup';\n    response.needs_followup = true;\n    response.missing_fields = missing;\n    response.error_code = 'MISSING_REQUIRED_FIELDS';\n    response.reply = \"Il me manque encore une information ou une confirmation explicite avant de créer la réservation.\";\n    return [{ json: response }];\n  }\n\n  if (Number(req.party_size) > Number(restaurant.max_party_size || 12)) {\n    response.ok = true;\n    response.decision = 'unavailable';\n    response.available = false;\n    response.error_code = 'PARTY_SIZE_TOO_LARGE';\n    response.reply = `Pour ${req.party_size} personnes, je dois transmettre la demande au restaurant au lieu de confirmer automatiquement.`;\n    return [{ json: response }];\n  }\n\n  if (isClosed) {\n    response.ok = true;\n    response.decision = 'unavailable';\n    response.available = false;\n    response.error_code = 'RESTAURANT_CLOSED';\n    response.reply = `Je ne peux pas confirmer cette réservation : le restaurant est fermé sur ce créneau${closure.closure_reason ? ` : ${closure.closure_reason}` : ''}.`;\n    return [{ json: response }];\n  }\n\n  if (reservationExists) {\n    response.ok = true;\n    response.decision = 'already_confirmed';\n    response.available = true;\n    response.confirmed = true;\n    response.duplicate = true;\n    response.reservation_id = existing.existing_reservation_id ?? null;\n    response.client_id = existing.existing_client_id ?? null;\n    response.reply = `Votre réservation est déjà confirmée${humanDate ? ` pour le ${humanDate}` : ''} au nom de ${req.full_name}, pour ${req.party_size} personne${Number(req.party_size) > 1 ? 's' : ''}.`;\n    return [{ json: response }];\n  }\n\n  if (reservationCreated) {\n    response.ok = true;\n    response.decision = 'confirmed';\n    response.available = true;\n    response.confirmed = true;\n    response.reservation_id = reservation.reservation_id ?? null;\n    response.client_id = reservation.client_id ?? client.client_id ?? null;\n    response.reply = `Votre réservation est confirmée${humanDate ? ` pour le ${humanDate}` : ''} au nom de ${req.full_name}, pour ${req.party_size} personne${Number(req.party_size) > 1 ? 's' : ''}. Merci et à bientôt.`;\n    return [{ json: response }];\n  }\n\n  response.error_code = 'RESERVATION_NOT_CREATED';\n  response.decision = 'technical_error';\n  response.reply = \"Je suis désolé, je n’ai pas pu créer la réservation automatiquement. Le restaurant pourra reprendre la demande.\";\n  return [{ json: response }];\n}\n\nif (req.action === 'log_conversation') {\n  response.ok = true;\n  response.decision = logSaved ? 'logged' : 'ignored';\n  response.reply = logSaved ? \"Conversation enregistrée.\" : \"Aucune conversation à enregistrer.\";\n  response.log_saved = logSaved;\n  response.log_id = log.log_id ?? null;\n  return [{ json: response }];\n}\n\nreturn [{ json: response }];"
+      },
+      "id": "250928d8-40bd-43a4-9cd3-ed3cbda6c058",
+      "name": "Build Unified Business Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3120,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH input AS (\n  SELECT\n    {{ $('Build Unified Business Response').item.json.restaurant_id || 'NULL' }}::bigint AS restaurant_id,\n    {{ $('Verify Channel Source').item.json.conversation_id_sql }}::text AS conversation_id,\n    {{ $('Verify Channel Source').item.json.source_sql }}::text AS source,\n    {{ $('Verify Channel Source').item.json.channel_sql }}::text AS channel,\n    {{ $('Verify Channel Source').item.json.provider_sql }}::text AS provider,\n    {{ $('Verify Channel Source').item.json.from_sql }}::text AS recipient,\n    {{ $('Verify Channel Source').item.json.to_sql }}::text AS sender,\n    CASE\n      WHEN {{ $('Verify Channel Source').item.json.source_sql }}::text = 'email' THEN 'Réponse à votre demande de réservation'\n      ELSE NULL\n    END::text AS subject,\n    '{{ String($('Build Unified Business Response').item.json.reply || '').replace(/'/g, \"''\") }}'::text AS content,\n    '{{ JSON.stringify($('Build Unified Business Response').item.json).replace(/'/g, \"''\") }}'::jsonb AS payload\n),\ninserted AS (\n  INSERT INTO outbound_messages (\n    restaurant_id,\n    conversation_id,\n    source,\n    channel,\n    provider,\n    recipient,\n    sender,\n    subject,\n    content,\n    payload,\n    status,\n    created_at,\n    updated_at\n  )\n  SELECT\n    restaurant_id,\n    conversation_id,\n    source,\n    channel,\n    provider,\n    recipient,\n    sender,\n    subject,\n    content,\n    payload,\n    'pending',\n    NOW(),\n    NOW()\n  FROM input\n  WHERE source IN ('email', 'instagram')\n    AND recipient IS NOT NULL\n    AND content IS NOT NULL\n  RETURNING *\n)\nSELECT\n  EXISTS (SELECT 1 FROM inserted) AS outbound_queued,\n  (SELECT id FROM inserted) AS outbound_message_id,\n  (SELECT source FROM inserted) AS queued_source,\n  (SELECT channel FROM inserted) AS queued_channel,\n  (SELECT recipient FROM inserted) AS queued_recipient;",
+        "options": {}
+      },
+      "id": "99c7500d-e142-4fa7-8e9f-138e4cbe4c0e",
+      "name": "Queue Outbound Message When Needed",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        3680,
+        864
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SaasPgBusinessV2",
+          "name": "Postgres @@CLIENT_ID@@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const req = $('Verify Channel Source').item.json;\nconst business = $('Build Unified Business Response').item.json;\nconst queue = $('Queue Outbound Message When Needed').item.json;\n\nconst route =\n  req.source === 'retell_voice' ? 'retell_voice_webhook' :\n  req.source === 'retell_sms' ? 'retell_sms_webhook' :\n  req.source === 'instagram' ? 'instagram_webhook_ack' :\n  req.source === 'email' ? 'email_webhook_ack' :\n  'generic_webhook_response';\n\nconst retellBody = {\n  ok: business.ok,\n  action: business.action,\n  decision: business.decision,\n  reply: business.reply,\n  available: business.available,\n  confirmed: business.confirmed,\n  duplicate: business.duplicate,\n  reservation_id: business.reservation_id,\n  client_id: business.client_id,\n  restaurant_id: business.restaurant_id,\n  restaurant_slug: business.restaurant_slug,\n  restaurant_name: business.restaurant_name,\n  conversation_id: business.conversation_id,\n  missing_fields: business.missing_fields,\n  error_code: business.error_code,\n  source_verification_status: business.source_verification_status,\n  source_warnings: business.source_warnings\n};\n\nconst asyncAckBody = {\n  ok: true,\n  accepted: true,\n  route,\n  source: req.source,\n  channel: req.channel,\n  provider: req.provider,\n  conversation_id: req.conversation_id,\n  outbound_queued: !!queue.outbound_queued,\n  outbound_message_id: queue.outbound_message_id ?? null,\n  reply_preview: business.reply,\n  note: 'Message reçu par n8n. La réponse canal est mise en file outbound_messages pour envoi par un workflow provider dédié.'\n};\n\nconst genericBody = {\n  ok: business.ok,\n  route,\n  source: req.source,\n  channel: req.channel,\n  business_response: business,\n  queue\n};\n\nconst response_body =\n  route === 'retell_voice_webhook' || route === 'retell_sms_webhook'\n    ? retellBody\n    : (route === 'email_webhook_ack' || route === 'instagram_webhook_ack'\n      ? asyncAckBody\n      : genericBody);\n\nreturn [{\n  json: {\n    ...business,\n    route,\n    response_body,\n    outbound_queued: !!queue.outbound_queued,\n    outbound_message_id: queue.outbound_message_id ?? null,\n    returned_to_same_provider:\n      (req.source === 'retell_voice' && route === 'retell_voice_webhook') ||\n      (req.source === 'retell_sms' && route === 'retell_sms_webhook') ||\n      (req.source === 'email' && route === 'email_webhook_ack') ||\n      (req.source === 'instagram' && route === 'instagram_webhook_ack'),\n    is_route_retell_voice: route === 'retell_voice_webhook',\n    is_route_retell_sms: route === 'retell_sms_webhook',\n    is_route_instagram: route === 'instagram_webhook_ack',\n    is_route_email: route === 'email_webhook_ack'\n  }\n}];"
+      },
+      "id": "63db4816-f1cc-4ac5-8e44-ff3b69c9942a",
+      "name": "Build Reply Router",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3968,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "8c36f010-cf81-42bb-a0b2-4346c982344f",
+              "leftValue": "={{ $json.is_route_retell_voice }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a22be514-df57-4074-a646-ce7e23e8c217",
+      "name": "Route Retell Voice?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        4240,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Build Unified Business Response').item.json }}",
+        "options": {}
+      },
+      "id": "d3ac4dfb-e898-4634-927d-5bb1ae588fd5",
+      "name": "Respond To Retell Voice",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        4528,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "7ff728f0-4fbc-4ab4-9b8d-e536bab9d584",
+              "leftValue": "={{ $json.is_route_retell_sms }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7b8aa64b-8984-46bd-87b2-d2515db38190",
+      "name": "Route Retell SMS?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        4496,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Build Unified Business Response').item.json }}",
+        "options": {}
+      },
+      "id": "70091dba-1ab3-4b87-ab4d-859fdbc66899",
+      "name": "Respond To Retell SMS",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        4800,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "d6841fe6-892f-4804-b70f-9e1c9408f475",
+              "leftValue": "={{ $json.is_route_instagram }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "17bc9494-3e1b-4dbf-a39d-f4bbcc12ec77",
+      "name": "Route Instagram?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        4800,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Build Unified Business Response').item.json }}",
+        "options": {}
+      },
+      "id": "5e79a59c-8a22-4fd5-b741-c9ff8bbe58b8",
+      "name": "Respond To Instagram Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        5088,
+        928
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "479783b5-6011-40d0-a6b3-8a0284fa6706",
+              "leftValue": "={{ $json.is_route_email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e8b74f18-3738-44ba-bcf0-bf056ed18bb5",
+      "name": "Route Email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        5088,
+        1184
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Build Unified Business Response').item.json }}",
+        "options": {}
+      },
+      "id": "82a24bc7-276b-403b-b4e2-64e4b90f962a",
+      "name": "Respond To Email Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        5360,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Build Unified Business Response').item.json }}",
+        "options": {}
+      },
+      "id": "acd2001b-1f15-4518-9c09-862cc5054d79",
+      "name": "Respond To Generic Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        5360,
+        1328
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Router multi-canal\n\nEntrées explicites :\n- Retell Voice\n- Retell SMS\n- Email\n- Instagram\n- Generic Webhook\n\nChaque entrée marque sa source avant normalisation.\nLe router final vérifie que la source repart sur la bonne réponse HTTP.\n\nPour Email et Instagram, le blueprint met la réponse en file `outbound_messages` au lieu d'inventer un node provider non vérifié.\n\nLa vérification cryptographique Retell n'est pas active dans ce blueprint : le champ `X-Retell-Signature` est détecté, mais la validation par secret/API key devra être ajoutée ensuite.",
+        "height": 320,
+        "width": 760
+      },
+      "id": "9ab2a4c0-0169-4f45-80ef-13d0cf81c897",
+      "name": "Note Router Multi Canal",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Retell Voice Function": {
+      "main": [
+        [
+          {
+            "node": "Mark Retell Voice Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Retell SMS Function": {
+      "main": [
+        [
+          {
+            "node": "Mark Retell SMS Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Email Inbound": {
+      "main": [
+        [
+          {
+            "node": "Mark Email Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Instagram Inbound": {
+      "main": [
+        [
+          {
+            "node": "Mark Instagram Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Generic Inbound": {
+      "main": [
+        [
+          {
+            "node": "Mark Generic Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Retell Voice Source": {
+      "main": [
+        [
+          {
+            "node": "Normalize Channel Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Retell SMS Source": {
+      "main": [
+        [
+          {
+            "node": "Normalize Channel Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Email Source": {
+      "main": [
+        [
+          {
+            "node": "Normalize Channel Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Instagram Source": {
+      "main": [
+        [
+          {
+            "node": "Normalize Channel Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Generic Source": {
+      "main": [
+        [
+          {
+            "node": "Normalize Channel Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Channel Input": {
+      "main": [
+        [
+          {
+            "node": "Verify Channel Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Channel Source": {
+      "main": [
+        [
+          {
+            "node": "Lookup Restaurant Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Restaurant Context": {
+      "main": [
+        [
+          {
+            "node": "Check Closure For Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Closure For Request": {
+      "main": [
+        [
+          {
+            "node": "Check Existing Reservation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Existing Reservation": {
+      "main": [
+        [
+          {
+            "node": "Upsert Client When Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Client When Needed": {
+      "main": [
+        [
+          {
+            "node": "Create Reservation When Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Reservation When Needed": {
+      "main": [
+        [
+          {
+            "node": "Save Channel Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Channel Log": {
+      "main": [
+        [
+          {
+            "node": "Build Unified Business Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Unified Business Response": {
+      "main": [
+        [
+          {
+            "node": "Queue Outbound Message When Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Queue Outbound Message When Needed": {
+      "main": [
+        [
+          {
+            "node": "Build Reply Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Reply Router": {
+      "main": [
+        [
+          {
+            "node": "Route Retell Voice?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Retell Voice?": {
+      "main": [
+        [
+          {
+            "node": "Respond To Retell Voice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route Retell SMS?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Retell SMS?": {
+      "main": [
+        [
+          {
+            "node": "Respond To Retell SMS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route Instagram?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Instagram?": {
+      "main": [
+        [
+          {
+            "node": "Respond To Instagram Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route Email?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Email?": {
+      "main": [
+        [
+          {
+            "node": "Respond To Email Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond To Generic Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionCounter": 55,
+  "sourceWorkflowId": null,
+  "tags": [],
+  "versionMetadata": {
+    "name": "Version 5fceb35d",
+    "description": ""
+  }
+}
