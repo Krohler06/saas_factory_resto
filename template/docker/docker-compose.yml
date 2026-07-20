@@ -1,6 +1,6 @@
 services:
 postgres:
-image: postgres:16
+image: postgres:16.14
 container_name: ${CLIENT_ID}_postgres
 environment:
 POSTGRES_DB: ${POSTGRES_DB}
@@ -21,7 +21,7 @@ networks:
 - tenant_net
 
 n8n:
-image: n8nio/n8n:latest
+image: n8nio/n8n:2.16.8
 container_name: ${CLIENT_ID}_n8n
 depends_on:
 postgres:
