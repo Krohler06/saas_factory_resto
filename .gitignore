@@ -1,41 +1,128 @@
-# Exports bruts
-exports/
-*.tgz
-*.tar.gz
-*.zip
+###############################################################################
+# Secrets et environnements
+###############################################################################
 
-# Secrets / environnements
 .env
 .env.*
-!.env.template
-**/.env
-**/.env.*
-!**/.env.template
-**/*DO_NOT_COMMIT*
-**/*private*
-**/*secret*
-**/*decrypted*
-**/credentials.encrypted.json
-**/credentials.decrypted*.json
+!.env.example
+!*.env.example
 
-# Données runtime Docker / n8n
-**/data/
-**/pgdata/
-**/logs/
-**/*.log
-**/tmp/
-**/.n8n/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
 
-# Backups
-*.bak
+###############################################################################
+# Sauvegardes, exports et fichiers runtime
+###############################################################################
+
+/backups/
+/exports/
+/generated/
+/baseline/
+
+/tenants/private/
+
+*.dump
 *.backup
-*.old
+*.tgz
+*.tar
+*.tar.gz
+*.zip
+*.gz
 
-# OS / éditeurs
-.DS_Store
-Thumbs.db
+###############################################################################
+# Python
+###############################################################################
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+###############################################################################
+# Fichiers temporaires
+###############################################################################
+
+*.bak
+*.bak.*
+*.old
+*.orig
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+###############################################################################
+# Logs et rapports générés
+###############################################################################
+
+*.log
+*.pid
+*.retry
+
+/docs/BOOKING_ENGINE_V2_BASELINE.md
+
+###############################################################################
+# Artefacts spécifiques à une promotion ou à un tenant
+###############################################################################
+
+/template/PROMOTED_FROM.txt
+/template/tenant_manifest.reference.json
+
+/template/caddy/routes.reference.txt
+
+/template/docker/*resolved*
+/template/docker/*exported*
+/template/docker/*reference*
+
+###############################################################################
+# Environnement template
+###############################################################################
+
+/template/env/*
+!/template/env/.gitkeep
+!/template/env/*.example
+!/template/env/*.template
+
+###############################################################################
+# Credentials n8n
+###############################################################################
+
+/template/n8n/credentials/*
+!/template/n8n/credentials/.gitkeep
+!/template/n8n/credentials/*.template.json
+
+###############################################################################
+# Workflows n8n
+#
+# Seuls les workflows explicitement transformés en modèles sont versionnés.
+###############################################################################
+
+/template/n8n/workflows/*
+!/template/n8n/workflows/.gitkeep
+!/template/n8n/workflows/*.template.json
+
+###############################################################################
+# Seeds SQL spécifiques aux restaurants
+###############################################################################
+
+/template/sql/seeds/*
+!/template/sql/seeds/.gitkeep
+!/template/sql/seeds/README.md
+!/template/sql/seeds/*.template.sql
+
+###############################################################################
+# IDE
+###############################################################################
+
 .vscode/
 .idea/
-
-# Tenant configurations containing real infrastructure/customer data
-tenants/private/
+.DS_Store
+Thumbs.db
