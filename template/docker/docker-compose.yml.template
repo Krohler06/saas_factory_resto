@@ -62,6 +62,7 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
       - ./n8n/workflows:/import/workflows:ro
+      - ./n8n/credentials:/import/credentials:ro
     networks:
       - internal
       - edge

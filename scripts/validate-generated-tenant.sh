@@ -43,6 +43,7 @@ required_files=(
   "docker-compose.yml"
   "tenant.snapshot.yml"
   "meta/manifest.json"
+  "n8n/credentials/postgres.json"
   "sql/010-booking-engine-v2-seed.sql"
   "SHA256SUMS"
 )
@@ -120,3 +121,13 @@ fi
 
 printf '[OK] Rendu valide : %s\n' "$GENERATED_DIR"
 
+
+while IFS= read -r credential; do
+  python3 -m json.tool "$credential" >/dev/null
+done < <(
+  find "$GENERATED_DIR/n8n/credentials" \
+    -maxdepth 1 \
+    -type f \
+    -name '*.json' \
+    | sort
+)
